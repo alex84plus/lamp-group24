@@ -21,8 +21,8 @@ CREATE TABLE `Users` (
     INDEX `idx_users_login` (`Login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create Colors Table
-CREATE TABLE `Colors` (
+-- Create Contact Table
+CREATE TABLE `Contacts` (
     `ID` INT NOT NULL AUTO_INCREMENT,
     `FirstName` VARCHAR(50) NOT NULL DEFAULT '',
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
