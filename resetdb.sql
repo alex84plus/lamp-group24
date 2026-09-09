@@ -30,7 +30,7 @@ CREATE TABLE `Contacts` (
     `Phone` VARCHAR(25),
     `Email` VARCHAR(100),
     PRIMARY KEY (`ID`),
-    INDEX `idx_colors_userid` (`UserID`)
+    INDEX `idx_contacts_userid` (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed Sample Users
