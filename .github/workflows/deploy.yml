@@ -1,90 +1,35 @@
-name: Deploy to droplet
+name: Deploy to Droplet
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions: {}
-
-concurrency:
-  group: droplet-production
-  cancel-in-progress: false
+    branches:
+      - main
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    env:
-      SSH_HOST: ${{ secrets.DROPLET_HOST }}
-      SSH_USER: ${{ secrets.DROPLET_USER }}
-      SSH_PRIVATE_KEY: ${{ secrets.DROPLET_SSH_KEY }}
-      SSH_KNOWN_HOSTS: ${{ secrets.DROPLET_KNOWN_HOSTS }}
-      SSH_PORT: ${{ vars.DROPLET_PORT || '22' }}
-      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
-      RESTART_COMMAND: ${{ vars.DEPLOY_RESTART_COMMAND || 'sudo -n systemctl reload apache2' }}
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Pull main and refresh the project
-        shell: bash
+      - name: Configure SSH
         run: |
-          set -euo pipefail
-          for name in SSH_HOST SSH_USER SSH_PRIVATE_KEY SSH_KNOWN_HOSTS DEPLOY_PATH; do
-            if [[ -z "${!name}" ]]; then
-              echo "::error::Missing deployment setting: $name"
-              exit 1
-            fi
-          done
-          if [[ "$DEPLOY_PATH" != /* ]]; then
-            echo '::error::DEPLOY_PATH must be an absolute path on the droplet.'
-            exit 1
-          fi
+          mkdir -p ~/.ssh
 
-          umask 077
-          ssh_dir=$(mktemp -d)
-          trap 'rm -rf -- "$ssh_dir"' EXIT
-          printf '%s\n' "$SSH_PRIVATE_KEY" > "$ssh_dir/key"
-          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$ssh_dir/known_hosts"
+          echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
 
-          # Base64 keeps paths and commands out of remote-shell interpolation.
-          path_arg=$(printf '%s' "$DEPLOY_PATH" | base64 -w 0)
-          restart_arg=$(printf '%s' "$RESTART_COMMAND" | base64 -w 0)
-          ssh -T -p "$SSH_PORT" -l "$SSH_USER" -i "$ssh_dir/key" \
-            -o BatchMode=yes \
-            -o IdentitiesOnly=yes \
-            -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile="$ssh_dir/known_hosts" \
-            -o ConnectTimeout=15 \
-            -o ServerAliveInterval=15 \
-            -o ServerAliveCountMax=3 \
-            "$SSH_HOST" "bash -se -- '$path_arg' '$restart_arg'" <<'REMOTE'
-          set -euo pipefail
-          export GIT_TERMINAL_PROMPT=0
-          export GIT_SSH_COMMAND='ssh -o BatchMode=yes -o StrictHostKeyChecking=yes'
-          deploy_path=$(printf '%s' "$1" | base64 --decode)
-          restart_command=$(printf '%s' "$2" | base64 --decode)
-          cd -- "$deploy_path"
+          echo "${{ secrets.DROPLET_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
-          # Also serialize remote processes if an Actions run is interrupted.
-          exec 9>"$(git rev-parse --git-path deploy.lock)"
-          flock -n 9 || { echo 'Another deployment is running.' >&2; exit 1; }
+      - name: Deploy
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            "${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}" '
+              set -e
 
-          if [[ "$(git branch --show-current)" != main ]]; then
-            echo 'The droplet checkout must be on main.' >&2
-            exit 1
-          fi
-          if [[ -n "$(git status --porcelain)" ]]; then
-            echo 'The droplet checkout has local changes; resolve them before deploying.' >&2
-            exit 1
-          fi
+              cd /var/www/html
 
-          git fetch --no-tags origin main
-          target=$(git rev-parse FETCH_HEAD)
-          if ! git merge-base --is-ancestor HEAD "$target"; then
-            echo 'The droplet has commits outside origin/main; resolve them before deploying.' >&2
-            exit 1
-          fi
-          git merge --ff-only "$target"
-          bash -euo pipefail -c "$restart_command"
-          printf 'Deployed main at %s\n' "$(git rev-parse HEAD)"
-          REMOTE
+              git fetch origin main
+              git reset --hard origin/main
+
+              echo "Deployment complete"
+            '
