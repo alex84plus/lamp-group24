@@ -1,6 +1,4 @@
--- Drop tables --
-DROP TABLE IF EXISTS `Users`;
-DROP TABLE IF EXISTS `Contacts`;
+
 -- Create and select database
 CREATE DATABASE IF NOT EXISTS `ContactManagerDB`
     DEFAULT CHARACTER SET utf8mb4
