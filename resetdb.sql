@@ -1,4 +1,6 @@
-
+-- Drop tables --
+DROP TABLE IF EXISTS `Users`;
+DROP TABLE IF EXISTS `Contacts`;
 -- Create and select database
 CREATE DATABASE IF NOT EXISTS `ContactManagerDB`
     DEFAULT CHARACTER SET utf8mb4
@@ -17,6 +19,8 @@ CREATE TABLE `Users` (
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
     `Login` VARCHAR(50) NOT NULL DEFAULT '',
     `Password` VARCHAR(50) NOT NULL DEFAULT '',
+    `Created` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `Updated` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`ID`),
     INDEX `idx_users_login` (`Login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -29,6 +33,8 @@ CREATE TABLE `Contacts` (
     `UserID` INT NOT NULL DEFAULT 0,
     `Phone` VARCHAR(25),
     `Email` VARCHAR(100),
+    `Created` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `Updated` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`ID`),
     INDEX `idx_contacts_userid` (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
