@@ -13,8 +13,8 @@ Live at: https://lamp.alex84plus.xyz/
 ### Contributors
 
 - Frontend: Nathan Davis
-- Backend: Put your name here gang
-- Database: put your name here gang
+- Backend: Daniel Rangosch
+- Database: Alexandra King,
 
 ### AI Disclosure
 

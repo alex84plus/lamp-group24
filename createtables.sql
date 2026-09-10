@@ -1,54 +1,39 @@
--- 1. Create the Database with utf8mb4 encoding
-
+-- Create and select database
 CREATE DATABASE IF NOT EXISTS `ContactManagerDB`
-
     DEFAULT CHARACTER SET utf8mb4
-
     DEFAULT COLLATE utf8mb4_unicode_ci;
-
 
 USE `ContactManagerDB`;
 
+-- Drop existing tables to ensure a clean state
+DROP TABLE IF EXISTS `Contacts`;
+DROP TABLE IF EXISTS `Users`;
 
--- 2. Create Users Table
-
-CREATE TABLE IF NOT EXISTS `Users` (
-
+-- Create Users Table
+CREATE TABLE `Users` (
     `ID` INT NOT NULL AUTO_INCREMENT,
-
     `FirstName` VARCHAR(50) NOT NULL DEFAULT '',
-
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
-
     `Login` VARCHAR(50) NOT NULL DEFAULT '',
-
     `Password` VARCHAR(50) NOT NULL DEFAULT '',
-
+    `Created` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `Updated` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`ID`),
-
     INDEX `idx_users_login` (`Login`)
-
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-CREATE TABLE IF NOT EXISTS `Contacts` (
-
+-- Create Contact Table
+CREATE TABLE `Contacts` (
     `ID` INT NOT NULL AUTO_INCREMENT,
-
-    `UserID` INT NOT NULL,
-
     `FirstName` VARCHAR(50) NOT NULL DEFAULT '',
-
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
-
+    `UserID` INT NOT NULL DEFAULT 0,
     `Phone` VARCHAR(25),
-
     `Email` VARCHAR(100),
-
+    `Created` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `Updated` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`ID`),
-
     INDEX `idx_contacts_userid` (`UserID`)
-
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create dedicated application database user
