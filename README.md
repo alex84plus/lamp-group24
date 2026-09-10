@@ -14,7 +14,7 @@ Live at: https://lamp.alex84plus.xyz/
 
 - Frontend: Nathan Davis
 - Backend: Put your name here gang
-- Database: put your name here gang
+- Database: Alexandra King,
 
 ### AI Disclosure
 
