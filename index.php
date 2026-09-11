@@ -46,15 +46,16 @@
                                 </label>
                                     <a href="api/resetpassword.php">Forgot Password?</a>
                             </div>
-                            <button class="form-btn" type="submit">Login</button>
+                            <button class="btn-primary" type="submit">Login</button>
                             <div class="login-divider">
                                 <span>OR</span>
                             </div>
-                            <button class="form-btn" type="button">Sign Up</button>
+                            <button class="btn-primary" type="button">Sign Up</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+        <script src="js/app.js"></script>
     </body>
 </html>

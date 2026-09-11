@@ -11,6 +11,33 @@ body {
     margin: 0;
 }
 
+body.debug-borders * {
+    outline: 1px solid rgba(255, 0, 0, 0.7);
+}
+
+.debug-toggle {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+}
+
+.debug-toggle input {
+    margin: 0;
+}
+
 .hero-container {
     min-height: 100vh;
     width: 100%;
@@ -108,7 +135,7 @@ body {
 }
 
 .form-input,
-.form-btn {
+.btn-primary {
     width: 100%;
     padding: 12px;
     border: 1px solid black;
@@ -147,7 +174,248 @@ body {
     box-shadow: none;
 }
 
-.form-btn {
+.btn-primary {
     background-color: black;
     color: white;
 }
+
+.dashboard-container {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+}
+
+.dashboard-inner {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+
+.contact-list-section {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid black;
+}
+
+.contact-list-spacer {
+    flex: 1;
+    margin: 0 40px;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+.contact-list-header,
+.contact-details-header {
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contact-list-header {
+    border-bottom: 1px solid black;
+}
+
+.contact-details-header {
+    border-bottom: 1px solid black;
+}
+
+.contact-list-search {
+    padding: 12px;
+}
+
+.contact-search-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid black;
+    border-radius: 0;
+    background-color: white;
+    font: inherit;
+}
+
+.contact-search-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.contact-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 12px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    list-style: none;
+}
+
+.contact-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid black;
+    background-color: white;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 16px;
+}
+
+.contact-list-avatar {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid black;
+    background-color: white;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 14px;
+}
+
+.contact-list-name h3 {
+    margin: 0;
+}
+
+.contact-list-name {
+    flex: 1;
+}
+
+.contact-list-delete form {
+    margin: 0;
+}
+
+.btn-delete-contact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+}
+
+.btn-delete-contact:hover {
+    background-color: black;
+    color: white;
+}
+
+.delete-contact-icon,
+.contact-action-icon {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.contact-list-action-item {
+    display: flex;
+}
+
+.btn-contact-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px dashed black;
+    background-color: white;
+    color: black;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-contact-action:hover {
+    border-style: solid;
+    background-color: black;
+    color: white;
+}
+
+.contact-list-logout {
+    padding: 12px;
+    border-top: 1px solid black;
+}
+
+.contact-list-logout form {
+    margin: 0;
+}
+
+.logout-button {
+    width: 100%;
+}
+
+.contact-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-details-panel {
+    margin: 36px;
+    border: 1px solid black;
+}
+
+.contact-details-bottom-border {
+    /* border-bottom: 1px solid black; */
+}
+
+.contact-form-header {
+    padding: 12px;
+    border-bottom: 1px solid black;
+}
+
+.contact-form-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.contact-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 16px;
+}
+
+.contact-form-footer {
+    padding: 0 12px 12px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
