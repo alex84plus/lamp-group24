@@ -35,20 +35,10 @@ function e($value) {
                         </div>
                         <ul class="contact-list-items">
                             <?php foreach ($contacts as $contact): ?>
-                            <li class="contact-list-item">
+                            <li class="contact-list-item<?= $contact['id'] === 1 ? ' is-active' : '' ?>"<?= $contact['id'] === 1 ? ' aria-current="true"' : '' ?>>
                                 <div class="contact-list-avatar"></div>
                                 <div class="contact-list-name">
                                     <h3><?= e($contact['name']) ?></h3>
-                                </div>
-                                <div class="contact-list-delete">
-                                    <form action="api/delete-contact.php" method="POST">
-                                        <input type="hidden" name="contact_id" value="<?= e($contact['id']) ?>">
-                                        <button class="btn-delete-contact" type="submit" aria-label="Delete contact" title="Delete contact">
-                                            <svg class="delete-contact-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
-                                                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"></path>
-                                            </svg>
-                                        </button>
-                                    </form>
                                 </div>
                             </li>
                             <?php endforeach; ?>
@@ -69,10 +59,50 @@ function e($value) {
                     </div>
                 </div>
                 <div class="contact-details">
-                    <div class="contact-details-header">
-                        <h2>{ Contact Details }</h2>
+                    <div class="contact-details-header"></div>
+                    <div class="contact-details-view">
+                        <div class="contact-view-header">
+                            <h2>Contact Details</h2>
+                            <div class="contact-view-actions">
+                                <button class="btn-contact-view-action" type="button" aria-label="Edit contact" title="Edit contact">
+                                    <svg class="contact-edit-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                                        <path d="M4 20h4L19 9l-4-4L4 16v4M13 7l4 4"></path>
+                                    </svg>
+                                </button>
+                                <form action="api/delete-contact.php" method="POST">
+                                    <input type="hidden" name="contact_id" value="1">
+                                    <button class="btn-contact-view-action" type="submit" aria-label="Delete contact" title="Delete contact">
+                                        <svg class="delete-contact-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                                            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="contact-view-body">
+                            <div class="contact-view-avatar-section">
+                                <div class="contact-view-avatar"></div>
+                            </div>
+                            <div class="contact-view-info">
+                                <div class="contact-view-name">
+                                    <h3>Monke J. Monkey</h3>
+                                </div>
+                                <div class="contact-view-field">
+                                    <span class="contact-view-label">Email Address</span>
+                                    <div class="contact-view-email">
+                                        <h3>john.monkey@example.com</h3>
+                                    </div>
+                                </div>
+                                <div class="contact-view-field">
+                                    <span class="contact-view-label">Phone Number</span>
+                                    <div class="contact-view-phone">
+                                        <h3>555-555-5555</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="contact-details-panel">
+                    <div class="contact-details-form">
                         <div class="contact-form-header">
                             <h2>CREATE NEW CONTACT</h2>
                         </div>
@@ -104,6 +134,5 @@ function e($value) {
                 </div>
             </div>
         </div>
-        <script src="js/app.js"></script>
     </body>
 </html>
