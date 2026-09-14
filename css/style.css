@@ -14,12 +14,27 @@
     --defaultBorder: #171716;
     --inverseBorder: #f7f3e9;
     --focusRing: #55534e;
+    --hatchEdgeWidth: 24px;
+    --hatchLineWidth: 1px;
+    --hatchPeriod: 4px;
 }
 
 *,
 *::before,
 *::after {
     box-sizing: border-box;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 body {
@@ -207,58 +222,46 @@ body {
     /* background-color: var(--surfaceBackground); */
 }
 
+/* Hatched edges with an inset surface plate, shared by the sidebar header and the spacer. */
+.contact-list-header,
 .contact-list-spacer {
-    --spacer-edge-width: 36px;
-    --spacer-pattern-line-width: 1px;
-    --spacer-pattern-size: 4px;
-
     position: relative;
-    flex: 1;
-    /* background-color: var(--surfaceBackground); */
     background-image: repeating-linear-gradient(
         -45deg,
-        var(--defaultBorder) 0 var(--spacer-pattern-line-width),
-        transparent var(--spacer-pattern-line-width) var(--spacer-pattern-size)
+        var(--defaultBorder) 0 var(--hatchLineWidth),
+        transparent var(--hatchLineWidth) var(--hatchPeriod)
     );
 }
 
+.contact-list-header::before,
 .contact-list-spacer::before {
     content: "";
     position: absolute;
-    inset: 0 var(--spacer-edge-width);
+    inset: 0 var(--hatchEdgeWidth);
     border-inline: 1px solid var(--defaultBorder);
     background-color: var(--surfaceBackground);
     pointer-events: none;
 }
 
-.contact-list-header,
-.contact-details-header {
-    min-height: 58px;
-    padding: 12px;
-    font-size: 18px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--surfaceBackground);
-}
-
-.contact-list-header h2,
-.contact-details-header h2 {
-    margin: 0;
+.contact-list-spacer {
+    flex: 1;
 }
 
 .contact-list-header {
+    min-height: 58px;
+    padding: 12px;
     border-bottom: 1px solid var(--defaultBorder);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 18px;
     font-weight: 600;
 }
 
-.contact-details-header {
-    border-bottom: 1px solid var(--defaultBorder);
-    justify-content: flex-end;
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 600;
+.contact-list-header h2 {
+    position: relative;
+    margin: 0;
 }
 
 .contact-list-search {
@@ -372,6 +375,11 @@ body {
     stroke-linejoin: round;
 }
 
+.delete-contact-icon,
+.contact-edit-icon {
+    stroke-width: 1.5;
+}
+
 .contact-list-action-item {
     display: flex;
 }
@@ -425,25 +433,190 @@ body {
 }
 
 .contact-details-view {
-    margin: 36px;
+    --contact-view-avatar-size: 56px;
+
+    width: min(720px, calc(100% - 72px));
+    /* Top margin puts the outer frame level with the sidebar search box: 58px header + 12px padding + 5px frame offset. */
+    margin: 75px auto 36px;
     border: 1px solid var(--defaultBorder);
+    outline: 1px solid var(--defaultBorder);
+    outline-offset: 2px;
+    background-color: var(--pageBackground);
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 16px;
 }
 
-.contact-view-header {
+.contact-view-identity {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
     padding: 12px;
-    border-bottom: 1px solid var(--defaultBorder);
-    background-color: var(--surfaceBackground);
+    background-color: var(--selectedBackground);
+    color: var(--inverseText);
 }
 
-.contact-view-header h2 {
+.contact-view-avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 var(--contact-view-avatar-size);
+    width: var(--contact-view-avatar-size);
+    height: var(--contact-view-avatar-size);
+    border: 1px solid var(--inverseBorder);
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.contact-view-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.contact-view-identity h2 {
     margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+.contact-view-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+    margin: 4px 0 0;
+    color: color-mix(in srgb, var(--inverseText) 72%, var(--selectedBackground));
+}
+
+.contact-view-meta-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 6px;
+}
+
+.contact-view-meta dt {
+    white-space: nowrap;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.contact-view-meta dd {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.contact-view-fields {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.contact-view-field {
+    display: grid;
+    grid-template-columns: var(--contact-view-avatar-size) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+}
+
+.contact-view-copy {
+    display: grid;
+    place-items: center;
+    justify-self: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--defaultBorder);
+    background-color: var(--surfaceBackground);
+    color: var(--primaryText);
+    cursor: pointer;
+}
+
+.contact-view-copy:hover,
+.contact-view-copy.is-copied {
+    border-color: var(--selectedBackground);
+    background-color: var(--selectedBackground);
+    color: var(--inverseText);
+}
+
+.contact-view-copy svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.contact-view-copied-icon,
+.contact-view-copy.is-copied .contact-view-copy-icon {
+    display: none;
+}
+
+.contact-view-copy.is-copied .contact-view-copied-icon {
+    display: block;
+}
+
+.contact-view-field-text {
+    min-width: 0;
+}
+
+.contact-view-label {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--secondaryText);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.contact-view-value {
+    display: block;
+    overflow: hidden;
     font-size: 18px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.contact-view-field-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--defaultBorder);
+    background-color: var(--pageBackground);
+    color: var(--primaryText);
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.contact-view-field-action:hover {
+    background-color: var(--hoverBackground);
+}
+
+.contact-view-field-action:active {
+    background-color: var(--selectedBackground);
+    color: var(--inverseText);
+}
+
+.contact-view-field-action-arrow {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    line-height: 1;
 }
 
 .contact-view-actions {
@@ -460,80 +633,36 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border: 1px solid var(--defaultBorder);
-    background-color: var(--pageBackground);
-    color: var(--primaryText);
+    gap: 8px;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--inverseBorder);
+    background-color: transparent;
+    color: var(--inverseText);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 16px;
     cursor: pointer;
 }
 
 .btn-contact-view-action:hover {
-    background-color: var(--primaryButtonBackground);
-    color: var(--inverseText);
+    background-color: var(--inverseText);
+    color: var(--primaryText);
 }
 
-.contact-view-body {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 24px;
-    padding: 24px;
+.btn-contact-view-action:active {
+    background-color: var(--surfaceBackground);
+    color: var(--primaryText);
 }
 
-.contact-view-avatar-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    aspect-ratio: 1 / 1;
-    border: 1px solid var(--defaultBorder);
+.contact-view-copy:focus-visible,
+.contact-view-field-action:focus-visible {
+    outline: 2px solid var(--focusRing);
+    outline-offset: 2px;
 }
 
-.contact-view-avatar {
-    width: 138px;
-    height: 138px;
-    background-color: var(--pageBackground);
-}
-
-.contact-view-info {
-    min-width: 0;
-}
-
-.contact-view-name {
-    margin-bottom: 12px;
-}
-
-.contact-view-name h3 {
-    margin: 0;
-    font-size: 24px;
-}
-
-.contact-view-field {
-    margin-bottom: 12px;
-}
-
-.contact-view-field:last-child {
-    margin-bottom: 0;
-}
-
-.contact-view-email,
-.contact-view-phone {
-    padding: 12px;
-    border: 1px solid var(--defaultBorder);
-}
-
-.contact-view-label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 16px;
-}
-
-.contact-view-email h3,
-.contact-view-phone h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: normal;
+.btn-contact-view-action:focus-visible {
+    outline: 2px solid var(--inverseBorder);
+    outline-offset: 2px;
 }
 
 .contact-details-form {
@@ -568,6 +697,60 @@ body {
 
 .contact-form-footer {
     padding: 0 12px 12px;
+}
+
+@media (max-width: 760px) {
+    .dashboard-inner {
+        display: block;
+    }
+
+    .contact-list-section {
+        border-right: 0;
+        border-bottom: 1px solid var(--defaultBorder);
+    }
+
+    .contact-list-spacer,
+    .contact-list-logout,
+    .contact-list-items .contact-list-item:not(.is-active) {
+        display: none;
+    }
+
+    .contact-details-view {
+        width: calc(100% - 32px);
+        margin: 24px auto 36px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-details-view {
+        --contact-view-avatar-size: 48px;
+    }
+
+    .contact-view-avatar {
+        font-size: 19px;
+    }
+
+    .contact-view-identity h2 {
+        font-size: 24px;
+    }
+
+    .contact-view-field-action {
+        width: 36px;
+        padding: 0;
+    }
+
+    .contact-view-field-action-text {
+        display: none;
+    }
+
+    .btn-contact-view-action {
+        width: 36px;
+        padding: 0;
+    }
+
+    .btn-contact-view-action-text {
+        display: none;
+    }
 }
 
 .color-preview-page {
