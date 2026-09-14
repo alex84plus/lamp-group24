@@ -215,11 +215,24 @@ body {
 }
 
 .contact-list-section {
+    position: relative;
     flex: 0 0 300px;
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--defaultBorder);
     /* background-color: var(--surfaceBackground); */
+}
+
+/* Second rule of the divider, 2px outside the border. */
+.contact-list-section::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -4px;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--defaultBorder);
+    pointer-events: none;
 }
 
 /* Hatched edges with an inset surface plate, shared by the sidebar header and the spacer. */
@@ -473,10 +486,7 @@ body {
 }
 
 .contact-view-identity h2 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 600;
-    line-height: 1.1;
+    margin: 0; font-size: 28px; font-weight: 600; line-height: 1.1;
     overflow-wrap: anywhere;
 }
 
@@ -597,7 +607,6 @@ body {
     gap: 8px;
     min-height: 36px;
     padding: 0 12px;
-    border: 1px solid var(--defaultBorder);
     background-color: var(--pageBackground);
     color: var(--primaryText);
     font-size: 16px;
@@ -707,6 +716,15 @@ body {
     .contact-list-section {
         border-right: 0;
         border-bottom: 1px solid var(--defaultBorder);
+    }
+
+    .contact-list-section::after {
+        top: auto;
+        right: 0;
+        bottom: -3px;
+        left: 0;
+        width: auto;
+        height: 1px;
     }
 
     .contact-list-spacer,
