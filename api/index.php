@@ -120,17 +120,26 @@ if ($method === 'GET')
     }
     else
     {
-        $stmt = $db->prepare(
-            'SELECT ID, FirstName, LastName, Phone, Email
-             FROM Contacts
-             WHERE UserID = :userId
-             ORDER BY LastName, FirstName'
-        );
+      $stmt = $db->prepare(
+    'SELECT ID, FirstName, LastName, Phone, Email
+     FROM Contacts
+     WHERE UserID = ?
+     AND (
+         FirstName LIKE ?
+         OR LastName LIKE ?
+         OR Phone LIKE ?
+         OR Email LIKE ?
+     )
+     ORDER BY LastName, FirstName'
+);
 
-        $stmt->execute([':userId' => $userId]);
-    }
+$searchTerm = '%' . $search . '%';
 
-    $contacts = $stmt->fetchAll();
-
-    respond(200, $contacts);
+$stmt->execute([
+    $userId,
+    $searchTerm,
+    $searchTerm,
+    $searchTerm,
+    $searchTerm
+]);
 }
