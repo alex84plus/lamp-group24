@@ -90,6 +90,31 @@ $userId = requireAuth();
 // 3. Get contacts for authenticated user
 if ($method === 'GET')
 {
+    // Get one contact by ID
+    if (isset($_GET['id']))
+    {
+        $contactId = (int) $_GET['id'];
+
+        $stmt = $db->prepare(
+            'SELECT ID, FirstName, LastName, Phone, Email
+             FROM Contacts
+             WHERE ID = ? AND UserID = ?
+             LIMIT 1'
+        );
+
+        $stmt->execute([$contactId, $userId]);
+
+        $contact = $stmt->fetch();
+
+        if (!$contact)
+        {
+            respond(404, ['error' => 'Contact not found']);
+        }
+
+        respond(200, $contact);
+    }
+
+    // Search contacts
     $search = isset($_GET['q']) ? clean($_GET['q']) : '';
 
     if ($search !== '')
@@ -130,7 +155,6 @@ if ($method === 'GET')
     }
 
     $contacts = $stmt->fetchAll();
-
     respond(200, $contacts);
 }
 
@@ -173,3 +197,4 @@ if ($method === 'POST')
         'Email'     => $email
     ]);
 }
+
