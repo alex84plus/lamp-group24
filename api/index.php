@@ -133,3 +133,43 @@ if ($method === 'GET')
 
     respond(200, $contacts);
 }
+
+// 4. Create a new contact
+if ($method === 'POST')
+{
+    $body = getRequestBody();
+
+    $firstName = clean($body['firstName'] ?? '');
+    $lastName  = clean($body['lastName'] ?? '');
+    $phone     = clean($body['phone'] ?? '');
+    $email     = clean($body['email'] ?? '');
+
+    if (!$firstName || !$lastName)
+    {
+        respond(400, ['error' => 'First name and last name are required']);
+    }
+
+    $stmt = $db->prepare(
+        'INSERT INTO Contacts
+         (FirstName, LastName, UserID, Phone, Email)
+         VALUES (?, ?, ?, ?, ?)'
+    );
+
+    $stmt->execute([
+        $firstName,
+        $lastName,
+        $userId,
+        $phone,
+        $email
+    ]);
+
+    $contactId = $db->lastInsertId();
+
+    respond(201, [
+        'ID'        => (int) $contactId,
+        'FirstName' => $firstName,
+        'LastName'  => $lastName,
+        'Phone'     => $phone,
+        'Email'     => $email
+    ]);
+}
