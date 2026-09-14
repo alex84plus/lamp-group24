@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$login = clean($_POST['login'] ?? '');
+$login = clean($_POST['username'] ?? '');
 $password = clean($_POST['password'] ?? '');
 
 if (!$login || !$password) {
