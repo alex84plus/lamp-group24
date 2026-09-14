@@ -1,6 +1,15 @@
 <?php
 // Session check goes here.
 
+<?php
+
+session_start();
+
+if (!isset($_SESSION['userId'])) {
+    header('Location: index.php');
+    exit;
+}
+
 $contacts = [
     ['id' => 1, 'firstName' => 'Monke', 'lastName' => 'Monkey'],
     ['id' => 2, 'firstName' => 'Jason', 'lastName' => 'Truvagoo'],
