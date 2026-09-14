@@ -108,7 +108,7 @@ if ($method === 'GET')
 
         if (!$contact)
         {
-            respond(404, ['error' => 'Contact not found']);
+            respond(404, ['error' => "Monke couldn't find the Contact"]);
         }
 
         respond(200, $contact);
@@ -198,3 +198,52 @@ if ($method === 'POST')
     ]);
 }
 
+// 5. Update a contact
+if ($method === 'PUT')
+{
+    if (!isset($_GET['id']))
+    {
+        respond(400, ['error' => 'Contact ID is required']);
+    }
+
+    $contactId = (int) $_GET['id'];
+    $body = getRequestBody();
+
+    $firstName = clean($body['firstName'] ?? '');
+    $lastName  = clean($body['lastName'] ?? '');
+    $phone     = clean($body['phone'] ?? '');
+    $email     = clean($body['email'] ?? '');
+
+    if (!$firstName || !$lastName)
+    {
+        respond(400, ['error' => 'First name and last name are required']);
+    }
+
+    $stmt = $db->prepare(
+        'UPDATE Contacts
+         SET FirstName = ?, LastName = ?, Phone = ?, Email = ?
+         WHERE ID = ? AND UserID = ?'
+    );
+
+    $stmt->execute([
+        $firstName,
+        $lastName,
+        $phone,
+        $email,
+        $contactId,
+        $userId
+    ]);
+
+    if ($stmt->rowCount() === 0)
+    {
+        respond(404, ['error' => 'Contact not found']);
+    }
+
+    respond(200, [
+        'ID'        => $contactId,
+        'FirstName' => $firstName,
+        'LastName'  => $lastName,
+        'Phone'     => $phone,
+        'Email'     => $email
+    ]);
+}
