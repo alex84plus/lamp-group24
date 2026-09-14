@@ -27,13 +27,16 @@ CREATE TABLE `Contacts` (
     `ID` INT NOT NULL AUTO_INCREMENT,
     `FirstName` VARCHAR(50) NOT NULL DEFAULT '',
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
-    `UserID` INT NOT NULL DEFAULT 0,
+    `UserID` INT NOT NULL,
     `Phone` VARCHAR(25),
     `Email` VARCHAR(100),
     `Created` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `Updated` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`ID`),
-    INDEX `idx_contacts_userid` (`UserID`)
+    INDEX `idx_contacts_userid` (`UserID`),
+    FOREIGN KEY (`UserID`)
+        REFERENCES Users(`ID`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create dedicated application database user
