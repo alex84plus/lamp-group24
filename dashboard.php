@@ -75,11 +75,14 @@ function e($value) {
                         <div class="contact-view-header">
                             <h2>Contact Details</h2>
                             <div class="contact-view-actions">
-                                <button class="btn-contact-view-action" type="button" aria-label="Edit contact" title="Edit contact">
-                                    <svg class="contact-edit-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                                 <form action="edit.php" method="GET">
+                                 <input type="hidden" name="id" value="1">
+                                     <button class="btn-contact-view-action" type="submit" aria-label="Edit contact" title="Edit contact">
+                                        <svg class="contact-edit-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
                                         <path d="M4 20h4L19 9l-4-4L4 16v4M13 7l4 4"></path>
-                                    </svg>
-                                </button>
+                                        </svg>
+                                     </button>
+                                 </form>
                                 <form action="api/delete-contact.php" method="POST">
                                     <input type="hidden" name="contact_id" value="1">
                                     <button class="btn-contact-view-action" type="submit" aria-label="Delete contact" title="Delete contact">
