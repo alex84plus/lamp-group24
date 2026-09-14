@@ -90,6 +90,31 @@ $userId = requireAuth();
 // 3. Get contacts for authenticated user
 if ($method === 'GET')
 {
+    // Get one contact by ID
+    if (isset($_GET['id']))
+    {
+        $contactId = (int) $_GET['id'];
+
+        $stmt = $db->prepare(
+            'SELECT ID, FirstName, LastName, Phone, Email
+             FROM Contacts
+             WHERE ID = ? AND UserID = ?
+             LIMIT 1'
+        );
+
+        $stmt->execute([$contactId, $userId]);
+
+        $contact = $stmt->fetch();
+
+        if (!$contact)
+        {
+            respond(404, ['error' => "Monke couldn't find the Contact"]);
+        }
+
+        respond(200, $contact);
+    }
+
+    // Search contacts
     $search = isset($_GET['q']) ? clean($_GET['q']) : '';
 
     if ($search !== '')
@@ -130,6 +155,125 @@ if ($method === 'GET')
     }
 
     $contacts = $stmt->fetchAll();
-
     respond(200, $contacts);
+}
+
+// 4. Create a new contact
+if ($method === 'POST')
+{
+    $body = getRequestBody();
+
+    $firstName = clean($body['firstName'] ?? '');
+    $lastName  = clean($body['lastName'] ?? '');
+    $phone     = clean($body['phone'] ?? '');
+    $email     = clean($body['email'] ?? '');
+
+    if (!$firstName || !$lastName)
+    {
+        respond(400, ['error' => 'First name and last name are required']);
+    }
+
+    $stmt = $db->prepare(
+        'INSERT INTO Contacts
+         (FirstName, LastName, UserID, Phone, Email)
+         VALUES (?, ?, ?, ?, ?)'
+    );
+
+    $stmt->execute([
+        $firstName,
+        $lastName,
+        $userId,
+        $phone,
+        $email
+    ]);
+
+    $contactId = $db->lastInsertId();
+
+    respond(201, [
+        'ID'        => (int) $contactId,
+        'FirstName' => $firstName,
+        'LastName'  => $lastName,
+        'Phone'     => $phone,
+        'Email'     => $email
+    ]);
+}
+
+// 5. Update a contact
+if ($method === 'PUT')
+{
+    if (!isset($_GET['id']))
+    {
+        respond(400, ['error' => 'Contact ID is required']);
+    }
+
+    $contactId = (int) $_GET['id'];
+    $body = getRequestBody();
+
+    $firstName = clean($body['firstName'] ?? '');
+    $lastName  = clean($body['lastName'] ?? '');
+    $phone     = clean($body['phone'] ?? '');
+    $email     = clean($body['email'] ?? '');
+
+    if (!$firstName || !$lastName)
+    {
+        respond(400, ['error' => 'First name and last name are required']);
+    }
+
+    $stmt = $db->prepare(
+        'UPDATE Contacts
+         SET FirstName = ?, LastName = ?, Phone = ?, Email = ?
+         WHERE ID = ? AND UserID = ?'
+    );
+
+    $stmt->execute([
+        $firstName,
+        $lastName,
+        $phone,
+        $email,
+        $contactId,
+        $userId
+    ]);
+
+    if ($stmt->rowCount() === 0)
+    {
+     respond(404, ['error' => "Monke couldn't find the Contact"]);
+    }
+
+    respond(200, [
+        'ID'        => $contactId,
+        'FirstName' => $firstName,
+        'LastName'  => $lastName,
+        'Phone'     => $phone,
+        'Email'     => $email
+    ]);
+}
+
+// 6. Delete a contact
+if ($method === 'DELETE')
+{
+    if (!isset($_GET['id']))
+    {
+        respond(400, ['error' => 'Contact ID is required']);
+    }
+
+    $contactId = (int) $_GET['id'];
+
+    $stmt = $db->prepare(
+        'DELETE FROM Contacts
+         WHERE ID = ? AND UserID = ?'
+    );
+
+    $stmt->execute([
+        $contactId,
+        $userId
+    ]);
+
+    if ($stmt->rowCount() === 0)
+    {
+        respond(404, ['error' => "Monke couldn't find the Contact"]);
+    }
+
+    respond(200, [
+        'message' => 'Monke deleted Contact successfully'
+    ]);
 }
