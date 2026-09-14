@@ -2,11 +2,11 @@
 // Session check goes here.
 
 $contacts = [
-    ['id' => 1, 'name' => 'Monke J. Monkey'],
-    ['id' => 2, 'name' => 'Jason P. Truvagoo'],
-    ['id' => 3, 'name' => 'Sally Z. Pablo'],
-    ['id' => 4, 'name' => 'John J. Latta'],
-    ['id' => 5, 'name' => 'Icarus B. Bentil'],
+    ['id' => 1, 'firstName' => 'Monke', 'lastName' => 'Monkey'],
+    ['id' => 2, 'firstName' => 'Jason', 'lastName' => 'Truvagoo'],
+    ['id' => 3, 'firstName' => 'Sally', 'lastName' => 'Pablo'],
+    ['id' => 4, 'firstName' => 'John', 'lastName' => 'Latta'],
+    ['id' => 5, 'firstName' => 'Icarus', 'lastName' => 'Bentil'],
 ];
 
 function e($value) {
@@ -28,7 +28,7 @@ function e($value) {
                 <div class="contact-list-section">
                     <div class="contact-list">
                         <div class="contact-list-header">
-                            <h2>{ Your Contacts }</h2>
+                            <h2>{ Contact Manager }</h2>
                         </div>
                         <div class="contact-list-search">
                             <input class="contact-search-input" type="search" name="contact_search" placeholder="Search contacts">
@@ -36,9 +36,11 @@ function e($value) {
                         <ul class="contact-list-items">
                             <?php foreach ($contacts as $contact): ?>
                             <li class="contact-list-item<?= $contact['id'] === 1 ? ' is-active' : '' ?>"<?= $contact['id'] === 1 ? ' aria-current="true"' : '' ?>>
-                                <div class="contact-list-avatar"></div>
+                                <div class="contact-list-avatar" aria-hidden="true">
+                                    <?= e(strtoupper(substr($contact['firstName'], 0, 1))) ?><?= e(strtoupper(substr($contact['lastName'], 0, 1))) ?>
+                                </div>
                                 <div class="contact-list-name">
-                                    <h3><?= e($contact['name']) ?></h3>
+                                    <h3><?= e($contact['firstName']) ?> <?= e($contact['lastName']) ?></h3>
                                 </div>
                             </li>
                             <?php endforeach; ?>
@@ -59,7 +61,9 @@ function e($value) {
                     </div>
                 </div>
                 <div class="contact-details">
-                    <div class="contact-details-header"></div>
+                    <div class="contact-details-header">
+                        
+                    </div>
                     <div class="contact-details-view">
                         <div class="contact-view-header">
                             <h2>Contact Details</h2>
@@ -81,7 +85,8 @@ function e($value) {
                         </div>
                         <div class="contact-view-body">
                             <div class="contact-view-avatar-section">
-                                <div class="contact-view-avatar"></div>
+                                <div class="contact-view-avatar">
+                                </div>
                             </div>
                             <div class="contact-view-info">
                                 <div class="contact-view-name">
