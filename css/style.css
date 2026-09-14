@@ -162,7 +162,7 @@ body {
 
 .form-input:focus {
     outline: 2px solid var(--focusRing);
-    outline-offset: 2px;
+    outline-offset: 1px;
     box-shadow: none;
 }
 
@@ -178,7 +178,7 @@ body {
 
 .btn-primary:focus-visible {
     outline: 2px solid var(--focusRing);
-    outline-offset: 2px;
+    outline-offset: 1px;
 }
 
 .form-input::placeholder,
@@ -204,14 +204,31 @@ body {
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--defaultBorder);
-    background-color: var(--surfaceBackground);
+    /* background-color: var(--surfaceBackground); */
 }
 
 .contact-list-spacer {
+    --spacer-edge-width: 36px;
+    --spacer-pattern-line-width: 1px;
+    --spacer-pattern-size: 4px;
+
+    position: relative;
     flex: 1;
-    margin: 0 40px;
-    border-left: 1px solid var(--defaultBorder);
-    border-right: 1px solid var(--defaultBorder);
+    /* background-color: var(--surfaceBackground); */
+    background-image: repeating-linear-gradient(
+        -45deg,
+        var(--defaultBorder) 0 var(--spacer-pattern-line-width),
+        transparent var(--spacer-pattern-line-width) var(--spacer-pattern-size)
+    );
+}
+
+.contact-list-spacer::before {
+    content: "";
+    position: absolute;
+    inset: 0 var(--spacer-edge-width);
+    border-inline: 1px solid var(--defaultBorder);
+    background-color: var(--surfaceBackground);
+    pointer-events: none;
 }
 
 .contact-list-header,
@@ -239,6 +256,9 @@ body {
 
 .contact-details-header {
     border-bottom: 1px solid var(--defaultBorder);
+    justify-content: flex-end;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 600;
 }
 
 .contact-list-search {
@@ -257,19 +277,41 @@ body {
 
 .contact-search-input:focus {
     outline: 2px solid var(--focusRing);
-    outline-offset: 2px;
+    outline-offset: 1px;
     box-shadow: none;
 }
 
+.contact-search-input::-webkit-search-cancel-button {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--primaryText);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    cursor: pointer;
+}
+
 .contact-list-items {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;
     margin: 0;
     padding: 12px;
-    border-top: 1px solid var(--defaultBorder);
     border-bottom: 1px solid var(--defaultBorder);
     list-style: none;
+}
+
+.contact-list-items::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 12px;
+    left: 12px;
+    border-top: 1px solid var(--defaultBorder);
+    pointer-events: none;
 }
 
 .contact-list-item {
@@ -300,13 +342,14 @@ body {
 }
 
 .contact-list-avatar {
+    display: grid;
+    place-items: center;
     flex: 0 0 36px;
     width: 36px;
     height: 36px;
     border: 1px solid var(--defaultBorder);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 14px;
+    font-weight: bold;
+    line-height: 1;
 }
 
 .contact-list-name h3 {
@@ -338,9 +381,9 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 44px;
-    padding: 0 12px;
-    border: 1px dashed var(--defaultBorder);
+    min-height: 62px;
+    /* padding: 0 12px; */
+    border: 2px dashed var(--defaultBorder);
     background-color: var(--pageBackground);
     color: var(--primaryText);
     font-family: "Cormorant Garamond", Georgia, serif;
@@ -349,7 +392,13 @@ body {
 }
 
 .btn-contact-action:hover {
-    border-style: solid;
+    border: 1px solid;
+    background-color: var(--hoverBackground);
+}
+
+.btn-contact-action:active,
+.btn-contact-action.is-active,
+.contact-list-action-item.is-active .btn-contact-action {
     background-color: var(--primaryButtonBackground);
     color: var(--inverseText);
 }
@@ -365,6 +414,8 @@ body {
 
 .logout-button {
     width: 100%;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 16px;
 }
 
 .contact-details {
@@ -617,7 +668,7 @@ body {
 .color-preview-copy:focus-visible,
 .color-preview-back:focus-visible {
     outline: 2px solid #1c1c1a;
-    outline-offset: 2px;
+    outline-offset: 1px;
 }
 
 .color-preview-option-copy strong,
