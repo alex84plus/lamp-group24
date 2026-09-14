@@ -87,7 +87,6 @@ if ($method === 'POST')
 
 // user auth required to access api calls beyond this point
 $userId = requireAuth();
-
 // 3. Get contacts for authenticated user
 if ($method === 'GET')
 {
@@ -98,12 +97,12 @@ if ($method === 'GET')
         $stmt = $db->prepare(
             'SELECT ID, FirstName, LastName, Phone, Email
              FROM Contacts
-             WHERE UserID = :userId
+             WHERE UserID = ?
              AND (
-                 FirstName LIKE :firstName
-                 OR LastName LIKE :lastName
-                 OR Phone LIKE :phone
-                 OR Email LIKE :email
+                 FirstName LIKE ?
+                 OR LastName LIKE ?
+                 OR Phone LIKE ?
+                 OR Email LIKE ?
              )
              ORDER BY LastName, FirstName'
         );
@@ -111,35 +110,26 @@ if ($method === 'GET')
         $searchTerm = '%' . $search . '%';
 
         $stmt->execute([
-            ':userId'   => $userId,
-            ':firstName' => $searchTerm,
-            ':lastName'  => $searchTerm,
-            ':phone'     => $searchTerm,
-            ':email'     => $searchTerm
+            $userId,
+            $searchTerm,
+            $searchTerm,
+            $searchTerm,
+            $searchTerm
         ]);
     }
     else
     {
-      $stmt = $db->prepare(
-    'SELECT ID, FirstName, LastName, Phone, Email
-     FROM Contacts
-     WHERE UserID = ?
-     AND (
-         FirstName LIKE ?
-         OR LastName LIKE ?
-         OR Phone LIKE ?
-         OR Email LIKE ?
-     )
-     ORDER BY LastName, FirstName'
-);
+        $stmt = $db->prepare(
+            'SELECT ID, FirstName, LastName, Phone, Email
+             FROM Contacts
+             WHERE UserID = ?
+             ORDER BY LastName, FirstName'
+        );
 
-$searchTerm = '%' . $search . '%';
+        $stmt->execute([$userId]);
+    }
 
-$stmt->execute([
-    $userId,
-    $searchTerm,
-    $searchTerm,
-    $searchTerm,
-    $searchTerm
-]);
+    $contacts = $stmt->fetchAll();
+
+    respond(200, $contacts);
 }
