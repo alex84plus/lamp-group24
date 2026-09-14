@@ -1,53 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Contact Manager Login</title>
-</head>
-<body>
+<?php
 
-<h1>Contact Manager</h1>
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/config/helpers.php';
 
-<form id="loginForm">
-    <input type="text" id="login" placeholder="Login" required>
-    <br><br>
+session_start();
 
-    <input type="password" id="password" placeholder="Password" required>
-    <br><br>
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../index.php');
+    exit;
+}
 
-    <button type="submit">Login</button>
-</form>
+$login = clean($_POST['login'] ?? '');
+$password = clean($_POST['password'] ?? '');
 
-<p id="message"></p>
+if (!$login || !$password) {
+    header('Location: ../index.php?error=missing');
+    exit;
+}
 
-<script>
-document.getElementById('loginForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
+$db = getDB();
 
-    const login = document.getElementById('login').value;
-    const password = document.getElementById('password').value;
+$stmt = $db->prepare(
+    'SELECT ID, FirstName, LastName
+     FROM Users
+     WHERE Login = ? AND Password = ?
+     LIMIT 1'
+);
 
-    const response = await fetch('index.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            login: login,
-            password: password
-        })
-    });
+$stmt->execute([$login, $password]);
 
-    const data = await response.json();
+$user = $stmt->fetch();
 
-    if (response.ok) {
-        document.getElementById('message').textContent =
-            'Welcome ' + data.firstName + ' ' + data.lastName;
-    } else {
-        document.getElementById('message').textContent =
-            data.error || 'Login failed';
-    }
-});
-</script>
+if (!$user) {
+    header('Location: ../index.php?error=invalid');
+    exit;
+}
 
-</body>
-</html>
+$_SESSION['userId'] = (int)$user['ID'];
+$_SESSION['firstName'] = $user['FirstName'];
+$_SESSION['lastName'] = $user['LastName'];
+
+setcookie('userId', (string)$user['ID'], 0, '/');
+
+header('Location: ../dashboard.php');
+exit;
