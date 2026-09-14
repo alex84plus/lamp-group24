@@ -247,3 +247,33 @@ if ($method === 'PUT')
         'Email'     => $email
     ]);
 }
+
+// 6. Delete a contact
+if ($method === 'DELETE')
+{
+    if (!isset($_GET['id']))
+    {
+        respond(400, ['error' => 'Contact ID is required']);
+    }
+
+    $contactId = (int) $_GET['id'];
+
+    $stmt = $db->prepare(
+        'DELETE FROM Contacts
+         WHERE ID = ? AND UserID = ?'
+    );
+
+    $stmt->execute([
+        $contactId,
+        $userId
+    ]);
+
+    if ($stmt->rowCount() === 0)
+    {
+        respond(404, ['error' => "Monke couldn't find the Contact"]);
+    }
+
+    respond(200, [
+        'message' => 'Monke deleted Contact successfully'
+    ]);
+}
