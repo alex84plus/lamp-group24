@@ -91,14 +91,39 @@ $userId = requireAuth();
 // 3. Get contacts for authenticated user
 if ($method === 'GET')
 {
-    $stmt = $db->prepare(
-        'SELECT ID, FirstName, LastName, Phone, Email
-         FROM Contacts
-         WHERE UserID = :userId
-         ORDER BY LastName, FirstName'
-    );
+    $search = isset($_GET['q']) ? clean($_GET['q']) : '';
 
-    $stmt->execute([':userId' => $userId]);
+    if ($search !== '')
+    {
+        $stmt = $db->prepare(
+            'SELECT ID, FirstName, LastName, Phone, Email
+             FROM Contacts
+             WHERE UserID = :userId
+             AND (
+                 FirstName LIKE :search
+                 OR LastName LIKE :search
+                 OR Phone LIKE :search
+                 OR Email LIKE :search
+             )
+             ORDER BY LastName, FirstName'
+        );
+
+        $stmt->execute([
+            ':userId' => $userId,
+            ':search' => '%' . $search . '%'
+        ]);
+    }
+    else
+    {
+        $stmt = $db->prepare(
+            'SELECT ID, FirstName, LastName, Phone, Email
+             FROM Contacts
+             WHERE UserID = :userId
+             ORDER BY LastName, FirstName'
+        );
+
+        $stmt->execute([':userId' => $userId]);
+    }
 
     $contacts = $stmt->fetchAll();
 
