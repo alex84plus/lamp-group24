@@ -42,6 +42,7 @@ body {
     margin: 0;
     background-color: var(--pageBackground);
     color: var(--primaryText);
+    cursor: url("../images/Monke-cursor.png") 119 35, auto;
 }
 
 .hero-container {
