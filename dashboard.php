@@ -3,10 +3,10 @@
 
 session_start();
 
-// if (!isset($_SESSION['userId'])) {
-//    header('Location: index.php');
-//     exit;
-// }
+ if (!isset($_SESSION['userId'])) {
+    header('Location: index.php');
+     exit;
+ }
 
 $contacts = [
     ['id' => 1, 'firstName' => 'Monke', 'lastName' => 'Monkey', 'created' => '2026-09-03 14:12:00'],
