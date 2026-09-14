@@ -100,17 +100,22 @@ if ($method === 'GET')
              FROM Contacts
              WHERE UserID = :userId
              AND (
-                 FirstName LIKE :search
-                 OR LastName LIKE :search
-                 OR Phone LIKE :search
-                 OR Email LIKE :search
+                 FirstName LIKE :firstName
+                 OR LastName LIKE :lastName
+                 OR Phone LIKE :phone
+                 OR Email LIKE :email
              )
              ORDER BY LastName, FirstName'
         );
 
+        $searchTerm = '%' . $search . '%';
+
         $stmt->execute([
-            ':userId' => $userId,
-            ':search' => '%' . $search . '%'
+            ':userId'   => $userId,
+            ':firstName' => $searchTerm,
+            ':lastName'  => $searchTerm,
+            ':phone'     => $searchTerm,
+            ':email'     => $searchTerm
         ]);
     }
     else
