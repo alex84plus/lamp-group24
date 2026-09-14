@@ -87,3 +87,20 @@ if ($method === 'POST')
 
 // user auth required to access api calls beyond this point
 $userId = requireAuth();
+
+// 3. Get contacts for authenticated user
+if ($method === 'GET')
+{
+    $stmt = $db->prepare(
+        'SELECT ID, FirstName, LastName, Phone, Email
+         FROM Contacts
+         WHERE UserID = :userId
+         ORDER BY LastName, FirstName'
+    );
+
+    $stmt->execute([':userId' => $userId]);
+
+    $contacts = $stmt->fetchAll();
+
+    respond(200, $contacts);
+}
