@@ -20,5 +20,6 @@ Dashboard: https://lamp.alex84plus.xyz/dashboard.php
 
 ### AI Disclosure
 
-Currently this project does not make use of any AI.
+Frontend:
+- Created the cursor with the assistance of generative AI
 
