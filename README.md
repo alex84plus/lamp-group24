@@ -15,7 +15,7 @@ Dashboard: https://lamp.alex84plus.xyz/dashboard.php
 ### Contributors
 
 - Frontend: Nathan Davis
-- Backend: Daniel Rangosch
+- Backend: Daniel Rangosch, Aidan Oien
 - Database: Alexandra King, Wilkenson Alcida
 
 ### AI Disclosure
