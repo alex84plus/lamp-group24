@@ -21,3 +21,28 @@ document.addEventListener('click', async (event) => {
     clearTimeout(button.resetTimer);
     button.resetTimer = setTimeout(() => button.classList.remove('is-copied'), 1500);
 });
+
+const deleteButton = document.getElementById("delete-contact-button");
+
+deleteButton.addEventListener("click", async () => {
+    const contactId = deleteButton.dataset.contactId;
+
+    const confirmed = confirm("Are you sure you want to delete this contact?");
+
+    if (!confirmed) {
+        return;
+    }
+
+    const response = await fetch(`api/index.php?id=${contactId}`, {
+        method: "DELETE"
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        alert("Contact deleted successfully.");
+        window.location.reload();
+    } else {
+        alert(data.error || "Failed to delete contact.");
+    }
+});
