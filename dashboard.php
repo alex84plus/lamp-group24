@@ -39,6 +39,7 @@ function isoDate($value) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dashboard | Contact Manager</title>
         <link rel="stylesheet" href="css/style.css">
+        <script src="js/site.js" type="module"></script>
         <script src="js/app.js" type="module"></script>
     </head>
     <body>
