@@ -5,17 +5,27 @@ if (!isset($_SESSION['userId'])) {
     header('Location: index.php');
     exit;
 }
+//Show the real contacts from the DB
+require_once __DIR__ . '/api/config/db.php';
 
-$contacts = [
-    ['id' => 1, 'firstName' => 'Monke', 'lastName' => 'Monkey', 'created' => '2026-09-03 14:12:00'],
-    ['id' => 2, 'firstName' => 'Jason', 'lastName' => 'Truvagoo', 'created' => '2026-08-21 10:05:00'],
-    ['id' => 3, 'firstName' => 'Sally', 'lastName' => 'Pablo', 'created' => '2026-08-27 16:48:00'],
-    ['id' => 4, 'firstName' => 'John', 'lastName' => 'Latta', 'created' => '2026-09-05 11:30:00'],
-    ['id' => 5, 'firstName' => 'Icarus', 'lastName' => 'Bentil', 'created' => '2026-09-10 19:22:00'],
-];
+$db = getDB();
 
-$selectedContactId = 1;
-$selectedContact = current(array_filter($contacts, fn ($contact) => $contact['id'] === $selectedContactId));
+$userId = $_SESSION['userId'];
+
+$stmt = $db->prepare(
+    'SELECT ID, FirstName, LastName, UserID, Phone, Email, Created
+     FROM Contacts
+     WHERE UserID = ?
+     ORDER BY LastName, FirstName'
+);
+
+$stmt->execute([$userId]);
+
+$contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$selectedContactId = $contacts[0]['ID'] ?? null;
+
+$selectedContact = $contacts[0] ?? null;
 
 function e($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -83,11 +93,14 @@ function isoDate($value) {
                         <header class="contact-view-identity">
                             <div class="contact-view-avatar" aria-hidden="true">MM</div>
                             <div class="contact-view-title">
-                                <h2 id="contact-view-name">Monke J. Monkey</h2>
+                                <h2 id="contact-view-name">
+                                 <?= e($selectedContact['FirstName'] ?? '') ?>
+                                 <?= e($selectedContact['LastName'] ?? '') ?>
+                                </h2>
                                 <dl class="contact-view-meta">
                                     <div class="contact-view-meta-item">
                                         <dt>Contact since</dt>
-                                        <dd><time datetime="<?= e(isoDate($selectedContact['created'])) ?>"><?= e(formatDate($selectedContact['created'])) ?></time></dd>
+                                        <dd><time datetime="<?= e(isoDate($selectedContact['Created'])) ?>"><?= e(formatDate($selectedContact['Created'])) ?></time></dd>
                                     </div>
                                 </dl>
                             </div>
@@ -99,13 +112,19 @@ function isoDate($value) {
                                     <span class="btn-contact-view-action-text">Edit</span>
                                 </button>
                                 <form action="api/delete-contact.php" method="POST">
-                                    <input type="hidden" name="contact_id" value="1">
-                                    <button class="btn-contact-view-action" type="submit" aria-label="Delete contact" title="Delete contact">
-                                        <svg class="delete-contact-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
-                                            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"></path>
-                                        </svg>
-                                        <span class="btn-contact-view-action-text">Delete</span>
-                                    </button>
+                                    <button
+                                        class="btn-contact-view-action"
+                                        type="button"
+                                         id="delete-contact-button"
+                                         aria-label="Delete contact"
+                                         title="Delete contact"
+                                         data-contact-id="<?= e($selectedContactId) ?>"
+                                    >
+                                         <svg class="delete-contact-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                                         <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10   11v5M14 11v5"></path>
+                                         </svg>
+                                   <span class="btn-contact-view-action-text">Delete</span>
+                                 </button>
                                 </form>
                             </div>
                         </header>
@@ -121,9 +140,11 @@ function isoDate($value) {
                                 </button>
                                 <span class="contact-view-field-text">
                                     <span class="contact-view-label">Email address</span>
-                                    <span class="contact-view-value">john.monkey@example.com</span>
+                                    <span class="contact-view-value">
+                                     <?= e($selectedContact['Email'] ?? '') ?>
+                                    </span>
                                 </span>
-                                <a class="contact-view-field-action" href="mailto:john.monkey@example.com" aria-label="Send email">
+                                <a class="contact-view-field-action" href="mailto:<?= e($selectedContact['Email'] ?? '') ?>" aria-label="Send email">
                                     <span class="contact-view-field-action-text">Email</span>
                                     <span class="contact-view-field-action-arrow" aria-hidden="true">&#8599;</span>
                                 </a>
@@ -139,9 +160,11 @@ function isoDate($value) {
                                 </button>
                                 <span class="contact-view-field-text">
                                     <span class="contact-view-label">Phone number</span>
-                                    <span class="contact-view-value">555-555-5555</span>
+                                   <span class="contact-view-value">
+                                      <?= e($selectedContact['Phone'] ?? '') ?>     
+                                    </span>
                                 </span>
-                                <a class="contact-view-field-action" href="tel:+15555555555" aria-label="Call phone number">
+                               <a class="contact-view-field-action" href="tel:<?= e($selectedContact['Phone'] ?? '') ?>" aria-label="Call phone number">
                                     <span class="contact-view-field-action-text">Call</span>
                                     <span class="contact-view-field-action-arrow" aria-hidden="true">&#8599;</span>
                                 </a>
