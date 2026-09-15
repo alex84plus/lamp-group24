@@ -1,5 +1,5 @@
 // Site-wide behavior loaded by every page.
-import { createInkCursor } from './ink-cursor.js';
+import { createInkCursor } from './cursor.js';
 
 const tokens = getComputedStyle(document.documentElement);
 const ink = tokens.getPropertyValue('--primaryText').trim();
