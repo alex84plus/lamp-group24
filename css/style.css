@@ -42,6 +42,36 @@ body {
     margin: 0;
     background-color: var(--pageBackground);
     color: var(--primaryText);
+    cursor: var(--dotCursor), auto;
+}
+
+/* Browser stylesheets give these their own cursors; the dot applies everywhere. */
+a,
+button,
+input,
+label,
+select,
+summary,
+textarea {
+    cursor: inherit;
+}
+
+/* The cursor is a black dot. js/cursor.js writes the cursor image into
+   --dotCursor and --dotCursorPaper and swells it on click. Dark surfaces set
+   --dot so the OS cursor image and the swell both pick the paper-colored dot. */
+.remember-input:checked,
+.btn-primary,
+.contact-list-item:active,
+.contact-list-item.is-active,
+.btn-contact-action:active,
+.btn-contact-action.is-active,
+.contact-list-action-item.is-active .btn-contact-action,
+.contact-view-identity,
+.contact-view-copy:hover,
+.contact-view-copy.is-copied,
+.contact-view-field-action:active {
+    --dot: paper;
+    cursor: var(--dotCursorPaper), auto;
 }
 
 .hero-container {
@@ -137,7 +167,6 @@ body {
     border: 1px solid var(--defaultBorder);
     border-radius: 0;
     background-color: var(--pageBackground);
-    cursor: pointer;
 }
 
 .form-input,
@@ -184,7 +213,6 @@ body {
 .btn-primary {
     background-color: var(--primaryButtonBackground);
     color: var(--inverseText);
-    cursor: pointer;
 }
 
 .btn-primary:hover {
@@ -306,7 +334,6 @@ body {
     background-color: var(--primaryText);
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-    cursor: pointer;
 }
 
 .contact-list-items {
@@ -339,7 +366,6 @@ body {
     background-color: var(--pageBackground);
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 16px;
-    cursor: pointer;
 }
 
 .contact-list-item:hover {
@@ -409,7 +435,6 @@ body {
     color: var(--primaryText);
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 16px;
-    cursor: pointer;
 }
 
 .btn-contact-action:hover {
@@ -547,7 +572,6 @@ body {
     border: 1px solid var(--defaultBorder);
     background-color: var(--surfaceBackground);
     color: var(--primaryText);
-    cursor: pointer;
 }
 
 .contact-view-copy:hover,
@@ -650,7 +674,6 @@ body {
     color: var(--inverseText);
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: 16px;
-    cursor: pointer;
 }
 
 .btn-contact-view-action:hover {
@@ -853,7 +876,6 @@ body {
     background: #fff;
     color: #1c1c1a;
     text-align: left;
-    cursor: pointer;
 }
 
 .color-preview-option:hover {
@@ -937,7 +959,6 @@ body {
     border: 1px solid #aaa8a2;
     border-radius: 50%;
     background: transparent;
-    cursor: pointer;
 }
 
 .color-preview-input-wrap input::-webkit-color-swatch-wrapper {
@@ -963,7 +984,6 @@ body {
     border-radius: 3px;
     background: #1c1c1a;
     color: #fff;
-    cursor: pointer;
 }
 
 .color-preview-back {
@@ -1100,7 +1120,6 @@ body {
     border-radius: 50%;
     background: transparent;
     color: inherit;
-    cursor: pointer;
 }
 
 .palette-demo-search {
@@ -1221,7 +1240,6 @@ body {
     border-radius: 3px;
     background: var(--preview-primary);
     color: var(--preview-paper);
-    cursor: pointer;
 }
 
 .palette-demo-actions .is-danger {

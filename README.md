@@ -4,6 +4,8 @@ Crazy lamp stack contact manager!!!!
 
 Login: https://lamp.alex84plus.xyz/
 
+Sign Up: https://lamp.alex84plus.xyz/signup.php
+
 Dashboard: https://lamp.alex84plus.xyz/dashboard.php
 
 ### Tech Stack
@@ -20,5 +22,6 @@ Dashboard: https://lamp.alex84plus.xyz/dashboard.php
 
 ### AI Disclosure
 
-Currently this project does not make use of any AI.
+Frontend:
+- Created the cursor with the assistance of generative AI
 
