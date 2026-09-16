@@ -5,7 +5,7 @@ USE `ContactManagerDB`;
 
 INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`) VALUES
   -- Default Admin Account
-('Admin', 'Account', 'root', 'admin67', 'Admin'), 
+('Application', 'Administrator', 'root', 'admin67', 'Admin'), 
 
 ('Trajan', 'Jho', 'TJ', 'HLYF', 'User'),
 
