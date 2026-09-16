@@ -17,6 +17,8 @@ CREATE TABLE `Users` (
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
     `Login` VARCHAR(50) NOT NULL DEFAULT '',
     `Password` VARCHAR(50) NOT NULL DEFAULT '',
+    `Role` VARCHAR(10) NOT NULL DEFAULT 'USER',
+    `IsDisabled` BOOLEAN NOT NULL DEFAULT FALSE,
     `Created` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `Updated` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`ID`),
@@ -41,15 +43,17 @@ CREATE TABLE `Contacts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed Sample Users
-INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`) VALUES
+INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`) VALUES
+  -- Default Admin Account
+('Application', 'Administrator', 'root', 'admin67', 'Admin'), 
 
-('Trajan', 'Jho', 'TJ', 'HLYF'),
+('Trajan', 'Jho', 'TJ', 'HLYF', 'User'),
 
-('Caedmon', 'Clover', 'Caed', 'cacapao'),
+('Caedmon', 'Clover', 'Caed', 'cacapao', 'User'),
 
-('Liam', 'Kelly', 'SuperFish', '1luvZomboidz'),
+('Liam', 'Kelly', 'SuperFish', '1luvZomboidz', 'User'),
 
-('Bailey', 'Brown', 'Speaker', '1luvSOT');
+('Bailey', 'Brown', 'Speaker', '1luvSOT', 'User');
 
 -- Sample Contacts for User 1 (Trajan Jho)
 

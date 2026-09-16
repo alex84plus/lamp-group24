@@ -3,15 +3,17 @@ USE `ContactManagerDB`;
 
 -- Sample Users
 
-INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`) VALUES
+INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`) VALUES
+  -- Default Admin Account
+('Application', 'Administrator', 'root', 'admin67', 'Admin'), 
 
-('Trajan', 'Jho', 'TJ', 'HLYF'),
+('Trajan', 'Jho', 'TJ', 'HLYF', 'User'),
 
-('Caedmon', 'Clover', 'Caed', 'cacapao'),
+('Caedmon', 'Clover', 'Caed', 'cacapao', 'User'),
 
-('Liam', 'Kelly', 'SuperFish', '1luvZomboidz'),
+('Liam', 'Kelly', 'SuperFish', '1luvZomboidz', 'User'),
 
-('Bailey', 'Brown', 'Speaker', '1luvSOT');
+('Bailey', 'Brown', 'Speaker', '1luvSOT', 'User');
 
 
 -- Sample Contacts for User 1 (Trajan Jho)
