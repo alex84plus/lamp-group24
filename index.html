@@ -6,6 +6,7 @@
         <title>Contact Manager</title>
         <link rel="stylesheet" href="css/style.css">
         <script src="js/site.js" type="module"></script>
+        <script src="js/code.js" type="module"></script>
     </head>
     <body>
         <div class="hero-container">
@@ -22,8 +23,8 @@
                     <div class="login-title">
                         Login to Contact Manager
                     </div>
-                    <!-- Login Form -->
-                    <form action="api/login.php" method="POST">
+                    <!-- Login Form, sent by js/code.js -->
+                    <form id="login-form">
                         <div class="login-form">
                             <!-- Username field-->
                             <input
@@ -57,13 +58,15 @@
                                     <!-- Forgot password link-->
                                     <a href="api/resetpassword.php">Forgot Password?</a>
                             </div>
+                            <!-- Why the last attempt failed, filled in by js/code.js-->
+                            <p class="login-error" id="login-error" role="alert" hidden></p>
                             <!-- Login button-->
                             <button class="btn-primary" type="submit">Login</button>
                             <div class="login-divider">
                                 <span>OR</span>
                             </div>
-                            <!-- Sign up button-->
-                            <button class="btn-primary" type="button">Sign Up</button>
+                            <!-- Sign up link-->
+                            <a class="btn-primary" href="signup.html">Sign Up</a>
                         </div>
                     </form>
                 </div>

@@ -263,6 +263,21 @@ html.blob-covering .hero-inner {
     background-color: var(--primaryButtonHoverBackground);
 }
 
+/* Sign Up navigates rather than acts, so it is a link wearing the button style. */
+a.btn-primary {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+
+/* Why a login attempt failed, filled in by js/code.js. */
+.login-error {
+    width: 100%;
+    margin: 0;
+    color: var(--accentFill);
+    font-size: 15px;
+}
+
 .btn-primary:focus-visible {
     outline: 2px solid var(--focusRing);
     outline-offset: 1px;
