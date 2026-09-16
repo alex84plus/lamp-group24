@@ -13,7 +13,7 @@
                 <div class="login-title">
                     Sign Up for Contact Manager
                 </div>
-                <form action="api/index.php" method="POST">
+                <form action="api/signup.php" method="POST">
                     <div class="login-form">
                         <input
                         class="form-input"
