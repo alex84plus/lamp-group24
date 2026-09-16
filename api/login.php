@@ -8,7 +8,7 @@ require_once __DIR__ . '/config/helpers.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php');
+    header('Location: ../index.html');
     exit;
 }
 
@@ -16,7 +16,7 @@ $login = clean($_POST['username'] ?? '');
 $password = clean($_POST['password'] ?? '');
 
 if (!$login || !$password) {
-    header('Location: ../index.php?error=missing');
+    header('Location: ../index.html?error=missing');
     exit;
 }
 
@@ -34,7 +34,7 @@ $stmt->execute([$login, $password]);
 $user = $stmt->fetch();
 
 if (!$user) {
-    header('Location: ../index.php?error=invalid');
+    header('Location: ../index.html?error=invalid');
     exit;
 }
 
@@ -44,5 +44,5 @@ $_SESSION['lastName'] = $user['LastName'];
 
 setcookie('userId', (string)$user['ID'], 0, '/');
 
-header('Location: ../dashboard.php');
+header('Location: ../dashboard.html');
 exit;

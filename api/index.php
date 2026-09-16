@@ -96,7 +96,7 @@ if ($method === 'GET')
         $contactId = (int) $_GET['id'];
 
         $stmt = $db->prepare(
-            'SELECT ID, FirstName, LastName, Phone, Email
+            'SELECT ID, FirstName, LastName, Phone, Email, Created
              FROM Contacts
              WHERE ID = ? AND UserID = ?
              LIMIT 1'
@@ -120,7 +120,7 @@ if ($method === 'GET')
     if ($search !== '')
     {
         $stmt = $db->prepare(
-            'SELECT ID, FirstName, LastName, Phone, Email
+            'SELECT ID, FirstName, LastName, Phone, Email, Created
              FROM Contacts
              WHERE UserID = ?
              AND (
@@ -145,7 +145,7 @@ if ($method === 'GET')
     else
     {
         $stmt = $db->prepare(
-            'SELECT ID, FirstName, LastName, Phone, Email
+            'SELECT ID, FirstName, LastName, Phone, Email, Created
              FROM Contacts
              WHERE UserID = ?
              ORDER BY LastName, FirstName'

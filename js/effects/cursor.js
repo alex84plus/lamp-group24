@@ -7,10 +7,10 @@
 // custom properties and the stylesheet wires them up:
 //
 //     body        { cursor: var(--dotCursor), auto; }
-//     .dark-thing { --dot: paper; cursor: var(--dotCursorPaper), auto; }
+//     .dark-thing { --dotSurface: dark; cursor: var(--dotCursorOnDark), auto; }
 //
-// The `--dot: paper` marker is inherited, so the swell below reads it from
-// whatever element is under the pointer and paints the same color the OS
+// The `--dotSurface: dark` marker is inherited, so the swell below reads it
+// from whatever element is under the pointer and paints the same color the OS
 // cursor shows there.
 //
 // The page takes over only while a click swells: on press it paints an
@@ -21,16 +21,15 @@
 // cursor while the OS catches up.
 //
 // The radius follows a damped spring, so the change between idle and pressed
-// is smooth and can overshoot a touch. The outline wobbles through the first
-// three oscillation modes of a liquid drop (n = 2, 3, 4): every size change
-// kicks the modes at a random orientation and they ring down on their own.
-// The frequency and decay ratios between modes follow the classic droplet
-// scalings, so higher modes run faster and die sooner, which is what keeps
-// the wobble from looking uniform.
+// is smooth and can overshoot a touch. The outline wobbles like a liquid drop
+// (wobble.js): every size change kicks it at a random orientation and it
+// rings down on its own.
 //
 // Nothing is created unless the device has a fine pointer that can hover, and
 // touch input never triggers the swell. Under prefers-reduced-motion the dot
 // still swells, but instantly and without wobble.
+
+import { createWobble } from './wobble.js';
 
 export const DEFAULTS = Object.freeze({
     idleRadius: 6.5,    // px, radius at rest
@@ -39,25 +38,18 @@ export const DEFAULTS = Object.freeze({
     bounce: 0.6,        // spring damping ratio. 1 never overshoots; lower bounces more.
     wobble: 0.14,       // peak wobble as a fraction of the radius
     settle: 200,        // ms for the wobble to fall to 1/e of its peak
-    ink: '#171716',     // dot color over light surfaces
-    paper: '#f7f3e9',   // dot color over surfaces marked `--dot: paper`
+    dotOnLight: '#171716', // dot color over light surfaces
+    dotOnDark: '#f7f3e9',  // dot color over surfaces marked `--dotSurface: dark`
 });
 
 const CLASS = 'ink-cursor-held';
 const LISTEN = { capture: true, passive: true };
 
-// Mode 2 is pinned to MODE_HZ; the others scale from it.
-const MODES = [2, 3, 4].map((n) => ({
-    n,
-    frequency: Math.sqrt((n * (n - 1) * (n + 2)) / 8), // 1, 1.94, 3
-    decay: ((n - 1) * (2 * n + 1)) / 5,                 // 1, 2.8, 5.4
-    gain: [1, 0.55, 0.3][n - 2],
-}));
-const MODE_HZ = 6;
+const MODE_HZ = 6;          // wobble frequency of the lowest droplet mode
 const MAX_WOBBLE = 0.3;     // keeps the outline from folding over itself
 const OUTLINE_POINTS = 72;
 const MAX_FRAME = 1 / 30;   // seconds; longer gaps are treated as a stall
-const SUBSTEP = 1 / 240;    // seconds; keeps the fastest mode stable
+const SUBSTEP = 1 / 240;    // seconds; keeps the radius spring stable
 
 // A CSS cursor value for a solid dot with the hotspot at its center.
 export function dotCursor(radius, color) {
@@ -93,6 +85,8 @@ export function createInkCursor(options = {}) {
     const style = document.createElement('style');
     style.textContent = `html.${CLASS}, html.${CLASS} * { cursor: none !important; }`;
 
+    const drop = createWobble({ hz: MODE_HZ, maxWobble: MAX_WOBBLE });
+
     const state = {
         x: 0,
         y: 0,
@@ -102,7 +96,6 @@ export function createInkCursor(options = {}) {
         radius: opts.idleRadius,
         velocity: 0,
         goal: opts.idleRadius,
-        modes: MODES.map(() => ({ c: 0, s: 0, vc: 0, vs: 0 })),
         pressed: false,
         active: false,
         frame: 0,
@@ -110,14 +103,14 @@ export function createInkCursor(options = {}) {
     };
 
     function applyIdleCursor() {
-        root.style.setProperty('--dotCursor', dotCursor(opts.idleRadius, opts.ink));
-        root.style.setProperty('--dotCursorPaper', dotCursor(opts.idleRadius, opts.paper));
+        root.style.setProperty('--dotCursor', dotCursor(opts.idleRadius, opts.dotOnLight));
+        root.style.setProperty('--dotCursorOnDark', dotCursor(opts.idleRadius, opts.dotOnDark));
     }
 
     function fill() {
         const over = state.over;
-        const paper = over && getComputedStyle(over).getPropertyValue('--dot').trim() === 'paper';
-        return paper ? opts.paper : opts.ink;
+        const onDark = over && getComputedStyle(over).getPropertyValue('--dotSurface').trim() === 'dark';
+        return onDark ? opts.dotOnDark : opts.dotOnLight;
     }
 
     function fit() {
@@ -145,13 +138,7 @@ export function createInkCursor(options = {}) {
         ctx.beginPath();
         for (let i = 0; i < OUTLINE_POINTS; i++) {
             const t = (i / OUTLINE_POINTS) * Math.PI * 2;
-            let f = 1;
-            for (let j = 0; j < MODES.length; j++) {
-                const m = state.modes[j];
-                const n = MODES[j].n;
-                f += m.c * Math.cos(n * t) + m.s * Math.sin(n * t);
-            }
-            const r = Math.max(0.5, state.radius * f);
+            const r = Math.max(0.5, state.radius * drop.scale(t));
             const px = Math.cos(t) * r;
             const py = Math.sin(t) * r;
             if (i === 0) ctx.moveTo(px, py);
@@ -165,52 +152,24 @@ export function createInkCursor(options = {}) {
     function integrate(dt) {
         const k = opts.snap;
         const c = 2 * opts.bounce * Math.sqrt(k);
-        const modeDecay = 2000 / opts.settle;
         const steps = Math.max(1, Math.ceil(dt / SUBSTEP));
         const h = dt / steps;
         for (let s = 0; s < steps; s++) {
             state.velocity += (-k * (state.radius - state.goal) - c * state.velocity) * h;
             state.radius += state.velocity * h;
-            for (let j = 0; j < MODES.length; j++) {
-                const m = state.modes[j];
-                const w = 2 * Math.PI * MODE_HZ * MODES[j].frequency;
-                const d = modeDecay * MODES[j].decay;
-                m.vc += (-w * w * m.c - d * m.vc) * h;
-                m.vs += (-w * w * m.s - d * m.vs) * h;
-                m.c += m.vc * h;
-                m.s += m.vs * h;
-            }
         }
-        let total = 0;
-        for (const m of state.modes) total += Math.hypot(m.c, m.s);
-        if (total > MAX_WOBBLE) {
-            const g = MAX_WOBBLE / total;
-            for (const m of state.modes) {
-                m.c *= g;
-                m.s *= g;
-                m.vc *= g;
-                m.vs *= g;
-            }
-        }
+        drop.step(dt, opts.settle);
     }
 
     function settleNow() {
         state.radius = state.goal;
         state.velocity = 0;
-        for (const m of state.modes) {
-            m.c = 0;
-            m.s = 0;
-            m.vc = 0;
-            m.vs = 0;
-        }
+        drop.reset();
     }
 
     function atRest() {
         if (Math.abs(state.radius - state.goal) > 0.02 || Math.abs(state.velocity) > 0.2) return false;
-        for (const m of state.modes) {
-            if (Math.hypot(m.c, m.s) > 0.001 || Math.hypot(m.vc, m.vs) > 0.05) return false;
-        }
-        return true;
+        return drop.settled();
     }
 
     function takeOver() {
@@ -260,14 +219,7 @@ export function createInkCursor(options = {}) {
 
     function kick() {
         if (reducedMotion.matches) return;
-        for (let j = 0; j < MODES.length; j++) {
-            const m = state.modes[j];
-            const w = 2 * Math.PI * MODE_HZ * MODES[j].frequency;
-            const angle = Math.random() * Math.PI * 2;
-            const impulse = opts.wobble * MODES[j].gain * w;
-            m.vc += Math.cos(angle) * impulse;
-            m.vs += Math.sin(angle) * impulse;
-        }
+        drop.kick(opts.wobble);
     }
 
     function setPressed(pressed) {
@@ -344,7 +296,7 @@ export function createInkCursor(options = {}) {
         root.removeEventListener('pointerleave', reset);
         window.removeEventListener('blur', reset);
         root.style.removeProperty('--dotCursor');
-        root.style.removeProperty('--dotCursorPaper');
+        root.style.removeProperty('--dotCursorOnDark');
         canvas.remove();
         style.remove();
     }

@@ -4,9 +4,9 @@ Crazy lamp stack contact manager!!!!
 
 Login: https://lamp.alex84plus.xyz/
 
-Sign Up: https://lamp.alex84plus.xyz/signup.php
+Sign Up: https://lamp.alex84plus.xyz/signup.html
 
-Dashboard: https://lamp.alex84plus.xyz/dashboard.php
+Dashboard: https://lamp.alex84plus.xyz/dashboard.html
 
 ### Tech Stack
 

@@ -1,11 +1,16 @@
 // Site-wide behavior loaded by every page.
-import { createInkCursor } from './cursor.js';
+import { createInkCursor } from './effects/cursor.js';
+import { createWobblyBlob } from './effects/blob.js';
 
 const tokens = getComputedStyle(document.documentElement);
-const ink = tokens.getPropertyValue('--primaryText').trim();
-const paper = tokens.getPropertyValue('--pageBackground').trim();
+const dotOnLight = tokens.getPropertyValue('--primaryText').trim();
+const dotOnDark = tokens.getPropertyValue('--pageBackground').trim();
 
 createInkCursor({
-    ...(ink && { ink }),
-    ...(paper && { paper }),
+    ...(dotOnLight && { dotOnLight }),
+    ...(dotOnDark && { dotOnDark }),
 });
+
+for (const blob of document.querySelectorAll('.login-blob')) {
+    createWobblyBlob(blob);
+}

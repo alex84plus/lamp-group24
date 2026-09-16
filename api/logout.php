@@ -9,5 +9,5 @@ session_destroy();
 
 setcookie('userId', '', time() - 3600, '/');
 
-header('Location: ../index.php');
+header('Location: ../index.html');
 exit;
