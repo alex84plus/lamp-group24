@@ -59,18 +59,18 @@ INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`) VALUE
 
 INSERT INTO `Contacts` (`UserID`, `FirstName`, `LastName`, `Phone`, `Email`) VALUES
 
-(1, 'Sona', 'Jho', '407-111-1234', 'sona@mail.com'),
-(1, 'Harry', 'Jho', '407-222-1734', 'harry@mail.com'),
-(1, 'Alex', 'Jho', '407-333-9564', 'alex@mail.com');
+(2, 'Sona', 'Jho', '407-111-1234', 'sona@mail.com'),
+(2, 'Harry', 'Jho', '407-222-1734', 'harry@mail.com'),
+(2, 'Alex', 'Jho', '407-333-9564', 'alex@mail.com');
 
 -- Sample Contacts for User 2 (Caedmon Clover)
 
 INSERT INTO `Contacts` (`UserID`, `FirstName`, `LastName`, `Phone`, `Email`) VALUES
 
-(2, 'Anthony', 'Gator', '407-444-2754', 'anthony@mail.com'),
-(2, 'Gwen', 'Deer', '407-555-7444', 'gwen@mail.com'),
-(2, 'Alex', 'Squirrel', '407-666-0563', 'alex@mail.com'),
-(2, 'Sam', 'Cat', '407-777-2400', 'sam@mail.com');
+(3, 'Anthony', 'Gator', '407-444-2754', 'anthony@mail.com'),
+(3, 'Gwen', 'Deer', '407-555-7444', 'gwen@mail.com'),
+(3, 'Alex', 'Squirrel', '407-666-0563', 'alex@mail.com'),
+(3, 'Sam', 'Cat', '407-777-2400', 'sam@mail.com');
 
 -- Create Application Database User & Privileges
 CREATE USER IF NOT EXISTS 'DBuser'@'localhost' IDENTIFIED BY 'WeLoveCOP4331!';
