@@ -13,8 +13,10 @@
                 <div class="login-title">
                     Sign Up for Contact Manager
                 </div>
+                <!-- Sign up form-->
                 <form action="api/signup.php" method="POST">
                     <div class="login-form">
+                        <!-- First name field-->
                         <input
                         class="form-input"
                         type="text"
@@ -23,6 +25,7 @@
                         placeholder="First Name"
                         required
                         >
+                        <!-- Last name field-->
                         <input
                         class="form-input"
                         type="text"
@@ -31,6 +34,7 @@
                         placeholder="Last Name"
                         required
                         >
+                        <!-- Username field-->
                         <input
                         class="form-input"
                         type="text"
@@ -39,6 +43,7 @@
                         placeholder="Username"
                         required
                         >
+                        <!-- Password field-->
                         <input
                         class="form-input"
                         type="password"
@@ -47,6 +52,7 @@
                         placeholder="Password"
                         required
                         >
+                        <!-- Submit button-->
                         <button class="btn-primary" type="submit">Sign Up</button>
                     </div>
                 </form>

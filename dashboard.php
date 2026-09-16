@@ -58,9 +58,11 @@ function isoDate($value) {
                         <div class="contact-list-header">
                             <h2>{ Contact Manager }</h2>
                         </div>
+                        <!-- Contact list search input-->
                         <div class="contact-list-search">
                             <input class="contact-search-input" type="search" name="contact_search" placeholder="Search contacts">
                         </div>
+                        <!-- Contact list items-->
                         <ul class="contact-list-items">
                             <?php foreach ($contacts as $contact): ?>
                                 <li class="contact-list-item<?= (int)$contact['ID'] === (int)$selectedContactId ? ' is-active' : '' ?>"
@@ -75,6 +77,7 @@ function isoDate($value) {
 
                                 </li>
                             <?php endforeach; ?>
+                            <!-- Contact list add contact button-->
                             <li class="contact-list-action-item">
                                 <button class="btn-contact-action" type="button" aria-label="Add contact" title="Add contact">
                                     <svg class="contact-action-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
@@ -84,14 +87,18 @@ function isoDate($value) {
                             </li>
                         </ul>
                     </div>
+                    <!-- spacer-->
                     <div class="contact-list-spacer"></div>
                     <div class="contact-list-logout">
+                        <!-- Logout form-->
                         <form action="api/logout.php" method="POST">
                             <button class="btn-primary logout-button" type="submit">Logout</button>
                         </form>
                     </div>
                 </div>
+                <!-- dashboard section-->
                 <div class="contact-details">
+                    <!-- contact details view showing info reated to the selected contact-->
                     <article class="contact-details-view" aria-labelledby="contact-view-name">
                         <header class="contact-view-identity">
                             <div class="contact-view-avatar" aria-hidden="true">MM</div>
@@ -108,12 +115,14 @@ function isoDate($value) {
                                 </dl>
                             </div>
                             <div class="contact-view-actions">
+                                <!-- Edit contact button-->
                                 <button class="btn-contact-view-action" type="button" aria-label="Edit contact" title="Edit contact">
                                     <svg class="contact-edit-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
                                         <path d="M4 20h4L19 9l-4-4L4 16v4M13 7l4 4"></path>
                                     </svg>
                                     <span class="btn-contact-view-action-text">Edit</span>
                                 </button>
+                                <!-- Delete contact button-->
                                 <form action="api/delete-contact.php" method="POST">
                                     <button
                                         class="btn-contact-view-action"
@@ -133,6 +142,7 @@ function isoDate($value) {
                         </header>
                         <ul class="contact-view-fields">
                             <li class="contact-view-field">
+                                <!-- Copy email button-->
                                 <button class="contact-view-copy" type="button" aria-label="Copy email address" title="Copy email address">
                                     <svg class="contact-view-copy-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                         <path d="M3 6h18v12H3zM3 7l9 7 9-7"></path>
@@ -141,18 +151,21 @@ function isoDate($value) {
                                         <path d="M5 12l5 5 9-10"></path>
                                     </svg>
                                 </button>
+                                <!-- Display email address-->
                                 <span class="contact-view-field-text">
                                     <span class="contact-view-label">Email address</span>
                                     <span class="contact-view-value">
                                      <?= e($selectedContact['Email'] ?? '') ?>
                                     </span>
                                 </span>
+                                <!-- Send email button-->
                                 <a class="contact-view-field-action" href="mailto:<?= e($selectedContact['Email'] ?? '') ?>" aria-label="Send email">
                                     <span class="contact-view-field-action-text">Email</span>
                                     <span class="contact-view-field-action-arrow" aria-hidden="true">&#8599;</span>
                                 </a>
                             </li>
                             <li class="contact-view-field">
+                                <!-- Copy phone number button-->
                                 <button class="contact-view-copy" type="button" aria-label="Copy phone number" title="Copy phone number">
                                     <svg class="contact-view-copy-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                         <path d="M7 3H4.5A1.5 1.5 0 003 4.5C3 13.6 10.4 21 19.5 21a1.5 1.5 0 001.5-1.5V17l-5-1-1.2 3a15.8 15.8 0 01-9.8-9.8L8 8 7 3z"></path>
@@ -161,13 +174,15 @@ function isoDate($value) {
                                         <path d="M5 12l5 5 9-10"></path>
                                     </svg>
                                 </button>
+                                <!-- Display phone number-->
                                 <span class="contact-view-field-text">
                                     <span class="contact-view-label">Phone number</span>
                                    <span class="contact-view-value">
                                       <?= e($selectedContact['Phone'] ?? '') ?>     
                                     </span>
                                 </span>
-                               <a class="contact-view-field-action" href="tel:<?= e($selectedContact['Phone'] ?? '') ?>" aria-label="Call phone number">
+                                <!-- Call phone number button-->
+                                <a class="contact-view-field-action" href="tel:<?= e($selectedContact['Phone'] ?? '') ?>" aria-label="Call phone number">
                                     <span class="contact-view-field-action-text">Call</span>
                                     <span class="contact-view-field-action-arrow" aria-hidden="true">&#8599;</span>
                                 </a>
@@ -175,6 +190,7 @@ function isoDate($value) {
                         </ul>
                         <p class="visually-hidden" id="copy-status" aria-live="polite"></p>
                     </article>
+                    <!-- contact details form used for adding new contacts, shown when the addd contact button is clicked-->
                     <div class="contact-details-form">
                         <div class="contact-form-header">
                             <h2>CREATE NEW CONTACT</h2>

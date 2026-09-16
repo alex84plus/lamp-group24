@@ -14,6 +14,7 @@
     --defaultBorder: #171716;
     --inverseBorder: #f7f3e9;
     --focusRing: #55534e;
+    --accentFill: #bd2725;
     --hatchEdgeWidth: 24px;
     --hatchLineWidth: 1px;
     --hatchPeriod: 4px;
@@ -69,7 +70,8 @@ textarea {
 .contact-view-identity,
 .contact-view-copy:hover,
 .contact-view-copy.is-copied,
-.contact-view-field-action:active {
+.contact-view-field-action:active,
+.login-blob {
     --dot: paper;
     cursor: var(--dotCursorPaper), auto;
 }
@@ -83,6 +85,8 @@ textarea {
 }
 
 .hero-inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: stretch;
 }
@@ -100,6 +104,45 @@ textarea {
     transform: translateY(84px);
     image-rendering: crisp-edges;
     image-rendering: pixelated;
+}
+
+/* A red blob behind the login hero, mostly off the page's bottom-right corner
+   so only its edge shows. It never starts left of the hero's center line,
+   which keeps it off Monke: red behind the transparent drawing hides its ink
+   lines. The hero is lifted above it (.hero-inner), and only the painted shape
+   takes presses, which js/blob.js turns into a wobble. Tapping it rapidly
+   grows it over the whole page, so it may paint past its own box. The layer is
+   pinned to the window, not the hero, so the cover reaches every edge however
+   tall the page is. */
+.login-blobs {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.login-blob {
+    position: absolute;
+    top: calc(100% - 360px);
+    left: max(calc(50% + 60px), calc(100% - 420px));
+    width: 760px;
+    height: 760px;
+    overflow: visible;
+    fill: var(--accentFill);
+    touch-action: manipulation;
+}
+
+.login-blob path {
+    pointer-events: visiblePainted;
+}
+
+/* js/blob.js sets --blobCover from 0, where the hero is still clear of the
+   blob, to 1, where the blob has swallowed it, and only once a blob is big
+   enough to hide it. The hero fades out across that and ignores presses, so
+   taps keep landing on the blob. */
+html.blob-covering .hero-inner {
+    opacity: calc(1 - var(--blobCover, 0));
+    pointer-events: none;
 }
 
 .login-container {
