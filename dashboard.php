@@ -63,14 +63,17 @@ function isoDate($value) {
                         </div>
                         <ul class="contact-list-items">
                             <?php foreach ($contacts as $contact): ?>
-                            <li class="contact-list-item<?= $contact['id'] === $selectedContactId ? ' is-active' : '' ?>"<?= $contact['id'] === $selectedContactId ? ' aria-current="true"' : '' ?>>
-                                <div class="contact-list-avatar" aria-hidden="true">
-                                    <?= e(strtoupper(substr($contact['firstName'], 0, 1))) ?><?= e(strtoupper(substr($contact['lastName'], 0, 1))) ?>
-                                </div>
-                                <div class="contact-list-name">
-                                    <h3><?= e($contact['firstName']) ?> <?= e($contact['lastName']) ?></h3>
-                                </div>
-                            </li>
+                                <li class="contact-list-item<?= (int)$contact['ID'] === (int)$selectedContactId ? ' is-active' : '' ?>"
+                                    <?= (int)$contact['ID'] === (int)$selectedContactId ? 'aria-current="true"' : '' ?>>
+                                        <div class="contact-list-avatar" aria-hidden="true">
+                                     <?= e(strtoupper(substr($contact['FirstName'], 0, 1))) ?><?= e(strtoupper(substr($contact['LastName'], 0, 1))) ?>
+                            </div>
+
+                         <div class="contact-list-name">
+                             <h3><?= e($contact['FirstName']) ?> <?= e($contact['LastName']) ?></h3>
+                             </div>
+
+                                </li>
                             <?php endforeach; ?>
                             <li class="contact-list-action-item">
                                 <button class="btn-contact-action" type="button" aria-label="Add contact" title="Add contact">
