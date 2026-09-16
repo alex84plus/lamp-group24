@@ -21,6 +21,7 @@ CREATE TABLE `Users` (
     `IsDisabled` BOOLEAN NOT NULL DEFAULT FALSE,
     `Created` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `Updated` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `IsVerified` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`ID`),
     INDEX `idx_users_login` (`Login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -43,17 +44,17 @@ CREATE TABLE `Contacts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed Sample Users
-INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`) VALUES
+INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`, `IsVerified`) VALUES
   -- Default Admin Account
-('Application', 'Administrator', 'root', 'admin67', 'Admin'), 
+('Application', 'Administrator', 'root', 'admin67', 'Admin', TRUE), 
 
-('Trajan', 'Jho', 'TJ', 'HLYF', 'User'),
+('Trajan', 'Jho', 'TJ', 'HLYF', 'User', TRUE),
 
-('Caedmon', 'Clover', 'Caed', 'cacapao', 'User'),
+('Caedmon', 'Clover', 'Caed', 'cacapao', 'User', TRUE),
 
-('Liam', 'Kelly', 'SuperFish', '1luvZomboidz', 'User'),
+('Liam', 'Kelly', 'SuperFish', '1luvZomboidz', 'User', TRUE),
 
-('Bailey', 'Brown', 'Speaker', '1luvSOT', 'User');
+('Bailey', 'Brown', 'Speaker', '1luvSOT', 'User', TRUE);
 
 -- Sample Contacts for User 1 (Trajan Jho)
 
