@@ -1,0 +1,74 @@
+[33m17ed923[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrestore-old-version[m[33m, [m[1;31morigin/restore-old-version[m[33m)[m Connect left bar to DB
+[33ma12521f[m Test using real DB contacts
+[33md85b861[m Test delete button
+[33m5a41aaa[m connect signup api to frontend
+[33mb98768d[m apiChanges to main merge
+[33m3a2adb7[m stop ignoring docs in the shared gitignore
+[33me964399[m remove local dev router from the repo
+[33m15a2d82[m update README.md
+[33m53ed92e[m fix dashboard class names
+[33m38490a3[m refactor js dir
+[33m9a29c4e[m update README.md
+[33m03cad6f[m Merge branch 'main' of https://github.com/alex84plus/lamp-group24
+[33m844227e[m update AI disclosure in README
+[33m7001d50[m add signup form
+[33ma0271cb[m updated global cursor styling
+[33md7febff[m[33m ([m[1;31morigin/apiBranch[m[33m)[m update readme
+[33m46876a3[m signup api call
+[33me8bee4a[m Update database contributors in README.md
+[33m41987db[m add monke cursor
+[33m56a88c2[m Edit button not working
+[33m8dcab0f[m Fix comments
+[33md2cea93[m Merge branch 'main' of https://github.com/alex84plus/lamp-group24
+[33m43aabea[m draft edit contact
+[33mcb7c00a[m update dashboard borders
+[33m6b4b7cb[m add signup.php
+[33mf37f026[m Merge branch 'main' of https://github.com/alex84plus/lamp-group24
+[33m4c94f3d[m contact detail additions
+[33md461bfe[m Fix logout?
+[33m06b9b88[m Fix bug
+[33mae77674[m Add session check and log out
+[33m1e25148[m fix bug
+[33m5a22ffb[m TEST
+[33mf0cfebc[m Log in draft
+[33m13e98bc[m Delete Function
+[33m6c126da[m Fix bugs
+[33m1ba9265[m Update contact function
+[33md644ae4[m Update get Function
+[33m99d058e[m Merge branch 'main' of https://github.com/alex84plus/lamp-group24
+[33meb8ef64[m Create contact Function
+[33m490d641[m update dashboard css
+[33mb67ad39[m Fix bug
+[33m598830f[m Index
+[33m9914a1e[m Get function
+[33m0ee8420[m Update Get function
+[33m8f4dda6[m api: get contacts for user function
+[33m9b37afe[m Update createtables.sql
+[33m0c84c85[m Update resetdb.sql
+[33m1c8f42a[m update color scheme
+[33mb874aad[m organize root, updated frontend index.php and dashboard.php
+[33mbd76f88[m update README.md to include dashboard link
+[33m91cb32c[m initial commit for dashboard.php
+[33mbf6885d[m api initial commit
+[33m777a754[m update font
+[33mdf2c7b6[m Merge branch 'main' of https://github.com/alex84plus/lamp-group24
+[33m96e3f63[m add login form to index.php
+[33mf12478f[m Update README.md
+[33m36dd9b2[m Update README.md
+[33m25a6b22[m Update resetdb.sql
+[33m6bb0633[m Update createtables.sql
+[33m772f26b[m Update resetdb.sql
+[33m7b7a781[m update README.md
+[33md2a7807[m update index.php
+[33m6416da0[m add .gitignore
+[33mf164845[m add README.md
+[33m0aa0243[m update deploy workflow
+[33m016d14a[m yo Merge branch 'main' of https://github.com/alex84plus/lamp-group24
+[33mc168ba6[m test deploy
+[33m2e3d5e5[m updated reset template
+[33m2b7c7c3[m Merge branch 'main' of https://github.com/alex84plus/lamp-group24
+[33m22ce347[m add github action workflow for auto deploying
+[33mf6d0dee[m Correct names
+[33md1a007b[m added reset sql
+[33m3b59ba4[m add frontend boilerplate
+[33mb435a2a[m Add files via upload
