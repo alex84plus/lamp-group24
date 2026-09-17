@@ -97,7 +97,6 @@ if (loginForm) startLogin(loginForm);
 // }
 
 function doLogin() {
-  alert("doLogin() triggered");
   userId = 0;
   firstName = "";
   lastName = "";
@@ -145,6 +144,22 @@ function doLogin() {
   } catch (err) {
     document.getElementById("login-error").innerHTML = err.message;
   }
+}
+
+function saveCookie() {
+  let minutes = 20;
+  let date = new Date();
+  date.setTime(date.getTime() + minutes * 60 * 1000);
+  document.cookie =
+    "firstName=" +
+    encodeURIComponent(firstName) +
+    ",lastName=" +
+    encodeURIComponent(lastName) +
+    ",userId=" +
+    userId +
+    ";expires=" +
+    date.toGMTString() +
+    ";path=/";
 }
 
 // The dashboard: the contact list and the details card, both filled from the API.
