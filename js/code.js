@@ -179,7 +179,7 @@ function startDashboard(list) {
         selectedContact = contacts[0] ?? null;
 
         renderList();
- s/login.js       renderDetails();
+        renderDetails();
     }
 
     // Copy buttons on the details card.
