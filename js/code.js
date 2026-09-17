@@ -146,6 +146,7 @@ function doLogin() {
   }
 }
 
+// save user info as a cookie
 function saveCookie() {
   let minutes = 20;
   let date = new Date();
@@ -160,6 +161,51 @@ function saveCookie() {
     ";expires=" +
     date.toGMTString() +
     ";path=/";
+}
+
+// this function should be the first thing ran on the dashboard page
+// it checks to make sure the user has a valid session and also loads
+// page content
+// TODO: implement this function into the html on dashboard.html
+function readCookie() {
+  userId = -1;
+  let data = document.cookie;
+  let splits = data.split(";");
+  for (var i = 0; i < splits.length; i++) {
+    let pair = splits[i].trim();
+    let tokens = pair.split(",");
+    for (var j = 0; j < tokens.length; j++) {
+      let keyVal = tokens[j].trim().split("=");
+      if (keyVal[0] === "firstName") {
+        firstName = decodeURIComponent(keyVal[1] || "");
+      } else if (keyVal[0] === "lastName") {
+        lastName = decodeURIComponent(keyVal[1] || "");
+      } else if (keyVal[0] === "userId") {
+        userId = parseInt(keyVal[1].trim());
+      }
+    }
+  }
+  if (userId < 0 || isNaN(userId)) {
+    window.location.href = "index.html";
+  } else {
+    let userNameEl = document.getElementById("userName");
+    if (userNameEl) {
+      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="text-white">${firstName} ${lastName}</strong></span>`;
+    }
+    // I believe you can put any functions you'd like to run when the page is loaded
+    // searchColor(); was here before
+  }
+}
+
+// Removes cookies on logout and returns you to index.html
+function doLogout() {
+  userId = 0;
+  firstName = "";
+  lastName = "";
+  document.cookie = "firstName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  document.cookie = "lastName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  document.cookie = "userId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  window.location.href = "index.html";
 }
 
 // The dashboard: the contact list and the details card, both filled from the API.
