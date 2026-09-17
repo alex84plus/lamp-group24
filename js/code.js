@@ -97,6 +97,7 @@ if (loginForm) startLogin(loginForm);
 // }
 
 function doLogin() {
+  alert("doLogin() triggered");
   userId = 0;
   firstName = "";
   lastName = "";
