@@ -15,8 +15,9 @@ CREATE TABLE `Users` (
     `ID` INT NOT NULL AUTO_INCREMENT,
     `FirstName` VARCHAR(50) NOT NULL DEFAULT '',
     `LastName` VARCHAR(50) NOT NULL DEFAULT '',
+    `Email` VARCHAR(100) NOT NULL DEFAULT '',
     `Login` VARCHAR(50) NOT NULL DEFAULT '',
-    `Password` VARCHAR(50) NOT NULL DEFAULT '',
+    `Password` VARCHAR(255) NOT NULL DEFAULT '',
     `Role` VARCHAR(10) NOT NULL DEFAULT 'USER',
     `IsDisabled` BOOLEAN NOT NULL DEFAULT FALSE,
     `Created` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -44,17 +45,17 @@ CREATE TABLE `Contacts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed Sample Users
-INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`, `IsVerified`) VALUES
+INSERT INTO `Users` (`FirstName`, `LastName`, `Email`, `Login`, `Password`, `Role`, `IsVerified`) VALUES
   -- Default Admin Account
-('Application', 'Administrator', 'root', 'admin67', 'Admin', TRUE), 
+('Application', 'Administrator', 'admin@monkeymail.com', 'root', 'admin67', 'Admin', TRUE), 
 
-('Trajan', 'Jho', 'TJ', 'HLYF', 'User', TRUE),
+('Trajan', 'Jho', 'dummy2@monkeymail.com', 'TJ', 'HLYF', 'User', TRUE),
 
-('Caedmon', 'Clover', 'Caed', 'cacapao', 'User', TRUE),
+('Caedmon', 'Clover', 'dummy3@monkeymail.com', 'Caed', 'cacapao', 'User', TRUE),
 
-('Liam', 'Kelly', 'SuperFish', '1luvZomboidz', 'User', TRUE),
+('Liam', 'Kelly', 'dummy4@monkeymail.com', 'SuperFish', '1luvZomboidz', 'User', TRUE),
 
-('Bailey', 'Brown', 'Speaker', '1luvSOT', 'User', TRUE);
+('Bailey', 'Brown', 'dummy5@monkeymail.com', 'Speaker', '1luvSOT', 'User', TRUE);
 
 -- Sample Contacts for User 1 (Trajan Jho)
 
