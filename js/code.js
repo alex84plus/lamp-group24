@@ -2,6 +2,16 @@
 // three pages, so each part checks for the markup it needs before running.
 // Values go into the page as text, so nothing needs escaping.
 
+//get url base
+const urlBase = (typeof window !== 'undefined' && window.location && 
+  (window.location.hostname === 'localhost' || 
+   window.location.hostname === '127.0.0.1' || 
+   window.location.origin.includes('alex84plus')))
+  ? '/api/index.php'
+  : 'http://lamp.alex84plus.xyz/api/index.php';
+
+const loginUrlBase = urlBase;
+
 // A static page cannot see the PHP session, so api/login.php also leaves a
 // readable userId cookie. This only turns a signed-out visitor around at the
 // door; the API is what keeps one user out of another's contacts.
@@ -44,45 +54,96 @@ function isoDate(value) {
 const loginForm = document.getElementById('login-form');
 if (loginForm) startLogin(loginForm);
 
-function startLogin(form) {
-    const error = document.getElementById('login-error');
+//old login function
+// function startLogin(form) {
+//     const error = document.getElementById('login-error');
 
-    function showError(message) {
-        error.textContent = message;
-        error.hidden = false;
-    }
+//     function showError(message) {
+//         error.textContent = message;
+//         error.hidden = false;
+//     }
 
-    // api/login.php answers with a redirect rather than JSON: to the dashboard
-    // when the login worked, back here with ?error=... when it did not. fetch
-    // follows that redirect, so response.url is what says which one happened.
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        error.hidden = true;
+//     // api/login.php answers with a redirect rather than JSON: to the dashboard
+//     // when the login worked, back here with ?error=... when it did not. fetch
+//     // follows that redirect, so response.url is what says which one happened.
+//     form.addEventListener('submit', async (event) => {
+//         event.preventDefault();
+//         error.hidden = true;
 
-        let landed;
+//         let landed;
 
-        try {
-            const response = await fetch('api/login.php', {
-                method: 'POST',
-                body: new URLSearchParams(new FormData(form)),
-            });
-            if (!response.ok) throw new Error(`Login request failed: ${response.status}`);
-            landed = new URL(response.url);
-        } catch (failure) {
-            console.error(failure);
-            showError('Could not reach the server. Try again.');
+//         try {
+//             const response = await fetch('api/login.php', {
+//                 method: 'POST',
+//                 body: new URLSearchParams(new FormData(form)),
+//             });
+//             if (!response.ok) throw new Error(`Login request failed: ${response.status}`);
+//             landed = new URL(response.url);
+//         } catch (failure) {
+//             console.error(failure);
+//             showError('Could not reach the server. Try again.');
+//             return;
+//         }
+
+//         if (landed.pathname.endsWith('/dashboard.html')) {
+//             window.location.replace('dashboard.html');
+//             return;
+//         }
+
+//         showError(landed.searchParams.get('error') === 'missing'
+//             ? 'Enter a username and password.'
+//             : 'That username and password do not match.');
+//     });
+// }
+
+function doLogin() {
+  userId = 0;
+  firstName = "";
+  lastName = "";
+
+  let loginInput = document.getElementById("username");
+  let passwordInput = document.getElementById("password");
+  let login = loginInput ? loginInput.value.trim() : "";
+  let password = passwordInput ? passwordInput.value.trim() : "";
+
+  // loginResult this is the text at the bottom that
+  // tells you "wrong username or password" usually
+  document.getElementById("login-error").innerHTML = "";
+
+  let jsonPayload = JSON.stringify({ login: login, password: password });
+  let url = loginUrlBase;
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+  try {
+    xhr.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          let jsonObject = JSON.parse(xhr.responseText);
+          userId = jsonObject.id;
+
+          if (userId < 1) {
+            document.getElementById("login-error") =
+              "User/Password combination incorrect";
             return;
-        }
+          }
 
-        if (landed.pathname.endsWith('/dashboard.html')) {
-            window.location.replace('dashboard.html');
-            return;
-        }
+          firstName = jsonObject.firstName;
+          lastName = jsonObject.lastName;
 
-        showError(landed.searchParams.get('error') === 'missing'
-            ? 'Enter a username and password.'
-            : 'That username and password do not match.');
-    });
+          saveCookie();
+          window.location.href = "dashboard.html";
+        } else {
+          document.getElementById("login-error").innerHTML =
+            "Login failed";
+        }
+      }
+    };
+    xhr.send(jsonPayload);
+  } catch (err) {
+    document.getElementById("login-error").innerHTML = err.message;
+  }
 }
 
 // The dashboard: the contact list and the details card, both filled from the API.

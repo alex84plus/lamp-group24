@@ -24,7 +24,7 @@
                         Login to Contact Manager
                     </div>
                     <!-- Login Form, sent by js/code.js -->
-                    <form id="login-form">
+                    <form id="login-form" onsubmit="event.preventDefault(); doLogin();">
                         <div class="login-form">
                             <!-- Username field-->
                             <input
