@@ -5,15 +5,15 @@ USE `ContactManagerDB`;
 
 INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`, `IsVerified`) VALUES
   -- Default Admin Account
-('Application', 'Administrator', 'root', 'admin67', 'Admin', TRUE), 
+('Application', 'Administrator', 'admin@monkeymail.com', 'root', 'admin67', 'Admin', TRUE), 
 
-('Trajan', 'Jho', 'TJ', 'HLYF', 'User', TRUE),
+('Trajan', 'Jho', 'dummy2@monkeymail.com', 'TJ', 'HLYF', 'User', TRUE),
 
-('Caedmon', 'Clover', 'Caed', 'cacapao', 'User', TRUE),
+('Caedmon', 'Clover', 'dummy3@monkeymail.com', 'Caed', 'cacapao', 'User', TRUE),
 
-('Liam', 'Kelly', 'SuperFish', '1luvZomboidz', 'User', TRUE),
+('Liam', 'Kelly', 'dummy4@monkeymail.com', 'SuperFish', '1luvZomboidz', 'User', TRUE),
 
-('Bailey', 'Brown', 'Speaker', '1luvSOT', 'User', TRUE);
+('Bailey', 'Brown', 'dummy5@monkeymail.com', 'Speaker', '1luvSOT', 'User', TRUE);
 
 
 -- Sample Contacts for User 1 (Trajan Jho)
