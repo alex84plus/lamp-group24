@@ -51,8 +51,8 @@ function isoDate(value) {
 }
 
 // The login page: the form never posts itself, this sends it.
-const loginForm = document.getElementById('login-form');
-if (loginForm) startLogin(loginForm);
+// const loginForm = document.getElementById('login-form');
+// if (loginForm) startLogin(loginForm);
 
 //old login function
 // function startLogin(form) {
@@ -194,6 +194,7 @@ function readCookie() {
     }
     // I believe you can put any functions you'd like to run when the page is loaded
     // searchColor(); was here before
+    startDashboard();
   }
 }
 
@@ -208,13 +209,14 @@ function doLogout() {
   window.location.href = "index.html";
 }
 
-// The dashboard: the contact list and the details card, both filled from the API.
-const contactList = document.querySelector('.contact-list-items');
-if (contactList) startDashboard(contactList);
+// =========
+// dashboard
+// =========
 
-function startDashboard(list) {
+function startDashboard() {
+    const contactList = document.querySelector('.contact-list-items');
     const status = document.getElementById('copy-status');
-    const addItem = list.querySelector('.contact-list-add-item');
+    const addItem = contactList.querySelector('.contact-list-add-item');
     const itemTemplate = document.getElementById('contact-list-item-template');
     const detailsView = document.querySelector('.contact-details-view');
     const deleteButton = document.getElementById('delete-contact-button');
@@ -236,7 +238,7 @@ function startDashboard(list) {
 
     // One cloned template item per contact, above the add button.
     function renderList() {
-        for (const item of list.querySelectorAll('.contact-list-item')) item.remove();
+        for (const item of contactList.querySelectorAll('.contact-list-item')) item.remove();
 
         for (const contact of contacts) {
             const item = itemTemplate.content.firstElementChild.cloneNode(true);
@@ -248,7 +250,7 @@ function startDashboard(list) {
                 item.setAttribute('aria-current', 'true');
             }
 
-            list.insertBefore(item, addItem);
+            contactList.insertBefore(item, addItem);
         }
     }
 
