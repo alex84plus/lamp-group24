@@ -287,13 +287,13 @@ function startDashboard() {
     // }
 
     try {
-      const response = await fetch('api/index.php');
-      if (response.status === 401) {
-        window.location.replace('index.html');
-        return;
-      }
-      if (!response.ok) throw new Error(`Contacts request failed: ${response.status}`);
-      contacts = await response.json();
+      // const response = await fetch('api/index.php');
+      // if (response.status === 401) {
+      //   window.location.replace('index.html');
+      //   return;
+      // }
+      // if (!response.ok) throw new Error(`Contacts request failed: ${response.status}`);
+      // contacts = await response.json();
     } catch (error) {
       console.error(error);
       status.textContent = 'Could not load contacts';
