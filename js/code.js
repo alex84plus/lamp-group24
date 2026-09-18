@@ -214,147 +214,147 @@ function doLogout() {
 // =========
 
 function startDashboard() {
-    const contactList = document.querySelector('.contact-list-items');
-    const status = document.getElementById('copy-status');
-    const addItem = contactList.querySelector('.contact-list-add-item');
-    const itemTemplate = document.getElementById('contact-list-item-template');
-    const detailsView = document.querySelector('.contact-details-view');
-    const deleteButton = document.getElementById('delete-contact-button');
+  const contactList = document.querySelector('.contact-list-items');
+  const status = document.getElementById('copy-status');
+  const addItem = contactList.querySelector('.contact-list-add-item');
+  const itemTemplate = document.getElementById('contact-list-item-template');
+  const detailsView = document.querySelector('.contact-details-view');
+  const deleteButton = document.getElementById('delete-contact-button');
 
-    const view = {
-        initials: document.getElementById('contact-view-initials'),
-        name: document.getElementById('contact-view-name'),
-        created: document.getElementById('contact-view-created'),
-        email: document.getElementById('contact-view-email'),
-        emailLink: document.getElementById('contact-view-email-link'),
-        phone: document.getElementById('contact-view-phone'),
-        phoneLink: document.getElementById('contact-view-phone-link'),
-    };
+  const view = {
+    initials: document.getElementById('contact-view-initials'),
+    name: document.getElementById('contact-view-name'),
+    created: document.getElementById('contact-view-created'),
+    email: document.getElementById('contact-view-email'),
+    emailLink: document.getElementById('contact-view-email-link'),
+    phone: document.getElementById('contact-view-phone'),
+    phoneLink: document.getElementById('contact-view-phone-link'),
+  };
 
-    // Filled in by loadContacts().
-    let contacts = [];
-    let selectedContactId = null;
-    let selectedContact = null;
+  // Filled in by loadContacts().
+  let contacts = [];
+  let selectedContactId = null;
+  let selectedContact = null;
 
-    // One cloned template item per contact, above the add button.
-    function renderList() {
-        for (const item of contactList.querySelectorAll('.contact-list-item')) item.remove();
+  // One cloned template item per contact, above the add button.
+  function renderList() {
+    for (const item of contactList.querySelectorAll('.contact-list-item')) item.remove();
 
-        for (const contact of contacts) {
-            const item = itemTemplate.content.firstElementChild.cloneNode(true);
-            item.querySelector('.contact-list-avatar').textContent = initials(contact);
-            item.querySelector('.contact-list-name h3').textContent = fullName(contact);
+    for (const contact of contacts) {
+      const item = itemTemplate.content.firstElementChild.cloneNode(true);
+      item.querySelector('.contact-list-avatar').textContent = initials(contact);
+      item.querySelector('.contact-list-name h3').textContent = fullName(contact);
 
-            if (Number(contact.ID) === Number(selectedContactId)) {
-                item.classList.add('is-active');
-                item.setAttribute('aria-current', 'true');
-            }
+      if (Number(contact.ID) === Number(selectedContactId)) {
+        item.classList.add('is-active');
+        item.setAttribute('aria-current', 'true');
+      }
 
-            contactList.insertBefore(item, addItem);
-        }
+      contactList.insertBefore(item, addItem);
+    }
+  }
+
+  // Hidden entirely when the user has no contacts yet.
+  function renderDetails() {
+    detailsView.hidden = !selectedContact;
+    if (!selectedContact) {
+      delete deleteButton.dataset.contactId;
+      return;
     }
 
-    // Hidden entirely when the user has no contacts yet.
-    function renderDetails() {
-        detailsView.hidden = !selectedContact;
-        if (!selectedContact) {
-            delete deleteButton.dataset.contactId;
-            return;
-        }
+    const email = selectedContact.Email ?? '';
+    const phone = selectedContact.Phone ?? '';
 
-        const email = selectedContact.Email ?? '';
-        const phone = selectedContact.Phone ?? '';
+    view.initials.textContent = initials(selectedContact);
+    view.name.textContent = fullName(selectedContact);
+    view.email.textContent = email;
+    view.emailLink.href = `mailto:${email}`;
+    view.phone.textContent = phone;
+    view.phoneLink.href = `tel:${phone}`;
+    deleteButton.dataset.contactId = selectedContact.ID;
 
-        view.initials.textContent = initials(selectedContact);
-        view.name.textContent = fullName(selectedContact);
-        view.email.textContent = email;
-        view.emailLink.href = `mailto:${email}`;
-        view.phone.textContent = phone;
-        view.phoneLink.href = `tel:${phone}`;
-        deleteButton.dataset.contactId = selectedContact.ID;
+    const iso = isoDate(selectedContact.Created);
+    view.created.textContent = formatDate(selectedContact.Created);
+    if (iso) view.created.dateTime = iso;
+    else view.created.removeAttribute('datetime');
+  }
 
-        const iso = isoDate(selectedContact.Created);
-        view.created.textContent = formatDate(selectedContact.Created);
-        if (iso) view.created.dateTime = iso;
-        else view.created.removeAttribute('datetime');
+  // The API sorts the rows, so the first contact is the one the card opens on.
+  async function loadContacts() {
+    // if (!signedIn()) {
+    //   window.location.replace('index.html');
+    //   return;
+    // }
+
+    try {
+      const response = await fetch('api/index.php');
+      if (response.status === 401) {
+        window.location.replace('index.html');
+        return;
+      }
+      if (!response.ok) throw new Error(`Contacts request failed: ${response.status}`);
+      contacts = await response.json();
+    } catch (error) {
+      console.error(error);
+      status.textContent = 'Could not load contacts';
+      return;
     }
 
-    // The API sorts the rows, so the first contact is the one the card opens on.
-    async function loadContacts() {
-        if (!signedIn()) {
-            window.location.replace('index.html');
-            return;
-        }
+    selectedContactId = contacts[0]?.ID ?? null;
+    selectedContact = contacts[0] ?? null;
 
-        try {
-            const response = await fetch('api/index.php');
-            if (response.status === 401) {
-                window.location.replace('index.html');
-                return;
-            }
-            if (!response.ok) throw new Error(`Contacts request failed: ${response.status}`);
-            contacts = await response.json();
-        } catch (error) {
-            console.error(error);
-            status.textContent = 'Could not load contacts';
-            return;
-        }
+    renderList();
+    renderDetails();
+  }
 
-        selectedContactId = contacts[0]?.ID ?? null;
-        selectedContact = contacts[0] ?? null;
+  // Copy buttons on the details card.
+  document.addEventListener('click', async (event) => {
+    const button = event.target.closest('.contact-view-copy');
+    if (!button) return;
 
-        renderList();
-        renderDetails();
+    const field = button.closest('.contact-view-field');
+    const label = field.querySelector('.contact-view-label').textContent;
+    const value = field.querySelector('.contact-view-value').textContent.trim();
+
+    try {
+        await navigator.clipboard.writeText(value);
+    } catch {
+      status.textContent = `Could not copy ${label.toLowerCase()}`;
+      return;
     }
 
-    // Copy buttons on the details card.
-    document.addEventListener('click', async (event) => {
-        const button = event.target.closest('.contact-view-copy');
-        if (!button) return;
+    status.textContent = `${label} copied`;
+    button.classList.add('is-copied');
+    clearTimeout(button.resetTimer);
+    button.resetTimer = setTimeout(() => button.classList.remove('is-copied'), 1500);
+  });
 
-        const field = button.closest('.contact-view-field');
-        const label = field.querySelector('.contact-view-label').textContent;
-        const value = field.querySelector('.contact-view-value').textContent.trim();
+  deleteButton.addEventListener('click', async () => {
+    const contactId = deleteButton.dataset.contactId;
 
-        try {
-            await navigator.clipboard.writeText(value);
-        } catch {
-            status.textContent = `Could not copy ${label.toLowerCase()}`;
-            return;
-        }
+    if (!contactId) {
+        return;
+    }
 
-        status.textContent = `${label} copied`;
-        button.classList.add('is-copied');
-        clearTimeout(button.resetTimer);
-        button.resetTimer = setTimeout(() => button.classList.remove('is-copied'), 1500);
+    const confirmed = confirm('Are you sure you want to delete this contact?');
+
+    if (!confirmed) {
+        return;
+    }
+
+    const response = await fetch(`api/index.php?id=${contactId}`, {
+        method: 'DELETE',
     });
 
-    deleteButton.addEventListener('click', async () => {
-        const contactId = deleteButton.dataset.contactId;
+    const data = await response.json();
 
-        if (!contactId) {
-            return;
-        }
+    if (response.ok) {
+        alert('Contact deleted successfully.');
+        window.location.reload();
+    } else {
+        alert(data.error || 'Failed to delete contact.');
+    }
+  });
 
-        const confirmed = confirm('Are you sure you want to delete this contact?');
-
-        if (!confirmed) {
-            return;
-        }
-
-        const response = await fetch(`api/index.php?id=${contactId}`, {
-            method: 'DELETE',
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            alert('Contact deleted successfully.');
-            window.location.reload();
-        } else {
-            alert(data.error || 'Failed to delete contact.');
-        }
-    });
-
-    loadContacts();
+  loadContacts();
 }
