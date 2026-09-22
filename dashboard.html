@@ -14,7 +14,7 @@
         </script>
     </head>
     <body>
-        <div class="dashboard-container">
+        <div class="dashboard-container" data-mobile-view="list">
             <div class="dashboard-inner">
                 <div class="contact-list-section">
                     <div class="contact-list">
@@ -25,29 +25,35 @@
                         <div class="contact-list-search">
                             <input class="contact-search-input" type="search" name="contact_search" placeholder="Search contacts">
                         </div>
-                        <!-- Contact list items, filled in by js/dashboard.js from the API-->
-                        <ul class="contact-list-items">
-                            <!-- Contact list add contact button-->
-                            <li class="contact-list-add-item">
-                                <button class="btn-add-contact" type="button" aria-label="Add contact" title="Add contact">
-                                    <svg class="add-contact-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
-                                        <path d="M12 5v14M5 12h14"></path>
-                                    </svg>
-                                </button>
-                            </li>
-                            <!-- Markup for one contact, cloned once per contact-->
-                            <template id="contact-list-item-template">
-                                <li class="contact-list-item">
-                                    <div class="contact-list-avatar" aria-hidden="true"></div>
-                                    <div class="contact-list-name">
-                                        <h3></h3>
-                                    </div>
-                                </li>
-                            </template>
-                        </ul>
+                        <div class="contact-list-scroll" role="region" aria-label="Contacts" tabindex="0">
+                            <!-- Contact list items, filled in by js/dashboard.js from the API-->
+                            <ul class="contact-list-items">
+                                <!-- Markup for one contact, cloned once per contact-->
+                                <template id="contact-list-item-template">
+                                    <li class="contact-list-entry">
+                                        <button class="contact-list-item" type="button">
+                                            <span class="contact-list-avatar" aria-hidden="true"></span>
+                                            <span class="contact-list-name">
+                                                <span class="contact-list-name-text"></span>
+                                            </span>
+                                            <span class="contact-list-chevron" aria-hidden="true">&#8250;</span>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
+                            <!-- spacer-->
+                            <div class="contact-list-spacer"></div>
+                        </div>
                     </div>
-                    <!-- spacer-->
-                    <div class="contact-list-spacer"></div>
+                    <!-- Fixed add contact action-->
+                    <div class="contact-list-add">
+                        <button class="btn-add-contact" type="button" aria-label="Add contact" title="Add contact">
+                            <svg class="add-contact-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                                <path d="M12 5v14M5 12h14"></path>
+                            </svg>
+                            <span class="btn-add-contact-text">Add contact</span>
+                        </button>
+                    </div>
                     <div class="contact-list-logout">
                         <!-- Logout form-->
                         <form onsubmit="doLogout();">
@@ -58,41 +64,24 @@
                 <!-- dashboard section-->
                 <div class="contact-details">
                     <!-- contact details view showing info reated to the selected contact, filled in by js/dashboard.js-->
-                    <article class="contact-details-view" aria-labelledby="contact-view-name" hidden>
+                    <article class="contact-details-view contact-workspace-panel" aria-labelledby="contact-view-heading" hidden>
+                        <button class="mobile-back-button" type="button" data-mobile-target="list">
+                            <span aria-hidden="true">&larr;</span>
+                            Back to contacts
+                        </button>
+                        <div class="contact-panel-heading">
+                            <h2 id="contact-view-heading">{ Contact }</h2>
+                        </div>
                         <header class="contact-view-identity">
                             <div class="contact-view-avatar" id="contact-view-initials" aria-hidden="true"></div>
                             <div class="contact-view-title">
-                                <h2 id="contact-view-name"></h2>
+                                <h3 id="contact-view-name"></h3>
                                 <dl class="contact-view-meta">
                                     <div class="contact-view-meta-item">
                                         <dt>Contact since</dt>
                                         <dd><time id="contact-view-created"></time></dd>
                                     </div>
                                 </dl>
-                            </div>
-                            <div class="contact-view-actions">
-                                <!-- Edit contact button-->
-                                <button class="btn-contact-view-action" type="button" aria-label="Edit contact" title="Edit contact">
-                                    <svg class="contact-edit-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
-                                        <path d="M4 20h4L19 9l-4-4L4 16v4M13 7l4 4"></path>
-                                    </svg>
-                                    <span class="btn-contact-view-action-text">Edit</span>
-                                </button>
-                                <!-- Delete contact button-->
-                                <form action="api/delete-contact.php" method="POST">
-                                    <button
-                                        class="btn-contact-view-action"
-                                        type="button"
-                                         id="delete-contact-button"
-                                         aria-label="Delete contact"
-                                         title="Delete contact"
-                                    >
-                                         <svg class="delete-contact-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
-                                         <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10   11v5M14 11v5"></path>
-                                         </svg>
-                                   <span class="btn-contact-view-action-text">Delete</span>
-                                 </button>
-                                </form>
                             </div>
                         </header>
                         <ul class="contact-view-fields">
@@ -139,46 +128,118 @@
                                 </a>
                             </li>
                         </ul>
+                        <div class="contact-view-footer">
+                            <button class="btn-contact-edit" id="edit-contact-button" type="button">Edit contact</button>
+                        </div>
                         <p class="visually-hidden" id="copy-status" aria-live="polite"></p>
                     </article>
+
+                    <!-- Editing is a deliberate mode so destructive actions stay out of the read-only view. -->
+                    <section class="contact-edit-form contact-workspace-panel" aria-labelledby="contact-edit-heading" hidden>
+                        <button class="mobile-back-button edit-back-button" type="button">
+                            <span aria-hidden="true">&larr;</span>
+                            Back to contact
+                        </button>
+                        <div class="contact-panel-heading">
+                            <h2 id="contact-edit-heading">{ Edit Contact }</h2>
+                        </div>
+                        <form class="contact-form" id="edit-contact-form">
+                            <div class="contact-form-fields">
+                                <div class="contact-form-field">
+                                    <label for="edit-first-name">First name</label>
+                                    <input type="text" name="first_name" id="edit-first-name" class="form-input" autocomplete="given-name" required>
+                                </div>
+                                <div class="contact-form-field">
+                                    <label for="edit-last-name">Last name</label>
+                                    <input type="text" name="last_name" id="edit-last-name" class="form-input" autocomplete="family-name" required>
+                                </div>
+                                <div class="contact-form-field">
+                                    <label for="edit-email">Email address</label>
+                                    <input type="email" name="email" id="edit-email" class="form-input" autocomplete="email">
+                                </div>
+                                <div class="contact-form-field">
+                                    <label for="edit-phone">Phone number</label>
+                                    <input type="tel" name="phone" id="edit-phone" class="form-input" autocomplete="tel">
+                                </div>
+                            </div>
+                            <div class="contact-form-footer contact-edit-actions">
+                                <button class="btn-primary" type="submit">Save changes</button>
+                                <button class="btn-contact-cancel" id="cancel-edit-button" type="button">Cancel</button>
+                            </div>
+                            <p class="contact-form-status" id="edit-contact-status" aria-live="polite"></p>
+                        </form>
+                        <div class="contact-form-danger">
+                            <button class="btn-delete-contact" type="button" id="delete-contact-button">
+                                <svg class="delete-contact-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"></path>
+                                </svg>
+                                Delete contact
+                            </button>
+                        </div>
+                    </section>
+
                     <!-- contact details form used for adding new contacts, shown when the addd contact button is clicked-->
-                    <div class="contact-details-form">
-                        <div class="contact-form-header">
-                            <h2>CREATE NEW CONTACT</h2>
+                    <section class="contact-details-form contact-workspace-panel" aria-labelledby="contact-add-heading">
+                        <button class="mobile-back-button" type="button" data-mobile-target="list">
+                            <span aria-hidden="true">&larr;</span>
+                            Back to contacts
+                        </button>
+                        <div class="contact-panel-heading">
+                            <h2 id="contact-add-heading">{ New Contact }</h2>
                         </div>
                         <!-- Contact form fields-->
-                        <form class="contact-form" action="api/add-contact.php" method="POST">
+                        <form class="contact-form" id="add-contact-form">
                             <div class="contact-form-fields">
                                 <!-- First name field-->
                                 <div class="contact-form-field">
-                                    <label for="first-name">First Name</label>
-                                    <input type="text" name="first_name" id="first-name" class="form-input" placeholder="John">
+                                    <label for="first-name">First name</label>
+                                    <input type="text" name="first_name" id="first-name" class="form-input" placeholder="Taylor" autocomplete="given-name" required>
                                 </div>
                                 <!-- Last name field-->
                                 <div class="contact-form-field">
-                                    <label for="last-name">Last Name</label>
-                                    <input type="text" name="last_name" id="last-name" class="form-input" placeholder="Doe">
+                                    <label for="last-name">Last name</label>
+                                    <input type="text" name="last_name" id="last-name" class="form-input" placeholder="Brooks" autocomplete="family-name" required>
                                 </div>
                                 <!-- Email address field-->
                                 <div class="contact-form-field">
-                                    <label for="email">Email Address</label>
-                                    <input type="email" name="email" id="email" class="form-input" placeholder="john.doe@example.com">
+                                    <label for="email">Email address</label>
+                                    <input type="email" name="email" id="email" class="form-input" placeholder="taylor@example.com" autocomplete="email">
                                 </div>
                                 <!-- Phone number field-->
                                 <div class="contact-form-field">
-                                    <label for="phone">Phone Number</label>
-                                    <input type="tel" name="phone" id="phone" class="form-input" placeholder="555-555-5555">
+                                    <label for="phone">Phone number</label>
+                                    <input type="tel" name="phone" id="phone" class="form-input" placeholder="321-555-0116" autocomplete="tel">
                                 </div>
                             </div>
                             <!-- Add contact button-->
                             <div class="contact-form-footer">
-                                <button class="btn-primary" type="submit">Add Contact</button>
+                                <button class="btn-primary" type="submit">Add contact</button>
                             </div>
+                            <p class="contact-form-status" id="add-contact-status" aria-live="polite"></p>
                         </form>
-                    </div>
+                    </section>
                     <div class="contact-details-bottom-border"></div>
                 </div>
             </div>
         </div>
+
+        <dialog
+            class="delete-contact-dialog"
+            id="delete-contact-dialog"
+            aria-label="Delete contact confirmation"
+            aria-describedby="delete-dialog-description delete-dialog-warning"
+        >
+            <div class="delete-dialog-content">
+                <p id="delete-dialog-description">
+                    <strong id="delete-dialog-contact-name"></strong> will be permanently removed.
+                </p>
+                <p class="delete-dialog-warning" id="delete-dialog-warning">This action cannot be undone.</p>
+                <p class="delete-dialog-status" id="delete-dialog-status" aria-live="polite"></p>
+            </div>
+            <form class="delete-dialog-actions" method="dialog">
+                <button class="btn-dialog-cancel" type="submit" value="cancel" autofocus>Cancel</button>
+                <button class="btn-dialog-delete" id="confirm-delete-contact-button" type="button">Delete contact</button>
+            </form>
+        </dialog>
     </body>
 </html>

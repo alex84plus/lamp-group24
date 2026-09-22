@@ -214,12 +214,34 @@ function doLogout() {
 // =========
 
 function startDashboard() {
+  const dashboard = document.querySelector('.dashboard-container');
   const contactList = document.querySelector('.contact-list-items');
+  const contactListScroll = document.querySelector('.contact-list-scroll');
+  const contactListSpacer = document.querySelector('.contact-list-spacer');
+  const contactListSearch = document.querySelector('.contact-list-search');
+  const contactListAdd = document.querySelector('.contact-list-add');
+  const addButton = contactListAdd.querySelector('.btn-add-contact');
   const status = document.getElementById('copy-status');
-  const addItem = contactList.querySelector('.contact-list-add-item');
   const itemTemplate = document.getElementById('contact-list-item-template');
   const detailsView = document.querySelector('.contact-details-view');
+  const detailsForm = document.querySelector('.contact-details-form');
+  const editPanel = document.querySelector('.contact-edit-form');
+  const editForm = document.getElementById('edit-contact-form');
+  const addForm = document.getElementById('add-contact-form');
+  const detailsBackButton = detailsView.querySelector('.mobile-back-button');
+  const addBackButton = detailsForm.querySelector('.mobile-back-button');
+  const editBackButton = editPanel.querySelector('.edit-back-button');
+  const editButton = document.getElementById('edit-contact-button');
+  const cancelEditButton = document.getElementById('cancel-edit-button');
   const deleteButton = document.getElementById('delete-contact-button');
+  const deleteDialog = document.getElementById('delete-contact-dialog');
+  const deleteDialogContactName = document.getElementById('delete-dialog-contact-name');
+  const deleteDialogStatus = document.getElementById('delete-dialog-status');
+  const confirmDeleteButton = document.getElementById('confirm-delete-contact-button');
+  const cancelDeleteButton = deleteDialog.querySelector('.btn-dialog-cancel');
+  const editStatus = document.getElementById('edit-contact-status');
+  const addStatus = document.getElementById('add-contact-status');
+  const mobileViewport = window.matchMedia('(max-width: 767px)');
 
   const view = {
     initials: document.getElementById('contact-view-initials'),
@@ -231,34 +253,198 @@ function startDashboard() {
     phoneLink: document.getElementById('contact-view-phone-link'),
   };
 
+  const editFields = {
+    firstName: document.getElementById('edit-first-name'),
+    lastName: document.getElementById('edit-last-name'),
+    email: document.getElementById('edit-email'),
+    phone: document.getElementById('edit-phone'),
+  };
+
   // Filled in by loadContacts().
   let contacts = [];
   let selectedContactId = null;
   let selectedContact = null;
+  let mobileReturnTarget = null;
+  let mobileWindowScroll = 0;
+  let mobileListScroll = 0;
 
-  // One cloned template item per contact, above the add button.
-  function renderList() {
-    for (const item of contactList.querySelectorAll('.contact-list-item')) item.remove();
+  function rememberMobileOrigin(target) {
+    if (!mobileViewport.matches) return;
 
-    for (const contact of contacts) {
-      const item = itemTemplate.content.firstElementChild.cloneNode(true);
-      item.querySelector('.contact-list-avatar').textContent = initials(contact);
-      item.querySelector('.contact-list-name h3').textContent = fullName(contact);
+    mobileReturnTarget = target;
+    mobileWindowScroll = window.scrollY;
+    mobileListScroll = contactListScroll.scrollTop;
+  }
 
-      if (Number(contact.ID) === Number(selectedContactId)) {
-        item.classList.add('is-active');
-        item.setAttribute('aria-current', 'true');
-      }
+  function focusMobileView(target) {
+    if (!mobileViewport.matches) return;
 
-      contactList.insertBefore(item, addItem);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      target.focus({ preventScroll: true });
+    });
+  }
+
+  function updateSelectedRows() {
+    for (const button of contactList.querySelectorAll('.contact-list-item')) {
+      const isActive = Number(button.dataset.contactId) === Number(selectedContactId);
+      button.classList.toggle('is-active', isActive);
+      if (isActive) button.setAttribute('aria-current', 'true');
+      else button.removeAttribute('aria-current');
     }
   }
+
+  function openContact(contact, trigger) {
+    rememberMobileOrigin(trigger);
+    selectedContactId = contact.ID;
+    selectedContact = contact;
+    dashboard.classList.remove('is-adding');
+    dashboard.classList.remove('is-editing');
+    editPanel.hidden = true;
+    contactListAdd.classList.remove('is-active');
+    dashboard.dataset.mobileView = 'detail';
+    updateSelectedRows();
+    renderDetails();
+    focusMobileView(detailsBackButton);
+  }
+
+  function openAddContact(trigger) {
+    rememberMobileOrigin(trigger);
+    dashboard.classList.remove('is-editing');
+    dashboard.classList.add('is-adding');
+    editPanel.hidden = true;
+    contactListAdd.classList.add('is-active');
+    dashboard.dataset.mobileView = 'add';
+    addStatus.textContent = '';
+
+    if (mobileViewport.matches) focusMobileView(addBackButton);
+    else detailsForm.querySelector('input')?.focus();
+  }
+
+  function returnToContactList() {
+    dashboard.dataset.mobileView = 'list';
+    dashboard.classList.remove('is-adding');
+    dashboard.classList.remove('is-editing');
+    editPanel.hidden = true;
+    contactListAdd.classList.remove('is-active');
+
+    requestAnimationFrame(() => {
+      contactListScroll.scrollTop = mobileListScroll;
+      window.scrollTo({ top: mobileWindowScroll, left: 0, behavior: 'auto' });
+      if (mobileReturnTarget?.isConnected) {
+        mobileReturnTarget.focus({ preventScroll: true });
+      }
+    });
+  }
+
+  function fillEditForm() {
+    if (!selectedContact) return;
+
+    editFields.firstName.value = selectedContact.FirstName ?? '';
+    editFields.lastName.value = selectedContact.LastName ?? '';
+    editFields.email.value = selectedContact.Email ?? '';
+    editFields.phone.value = selectedContact.Phone ?? '';
+    editStatus.textContent = '';
+  }
+
+  function openEditContact() {
+    if (!selectedContact) return;
+
+    fillEditForm();
+    dashboard.classList.remove('is-adding');
+    dashboard.classList.add('is-editing');
+    editPanel.hidden = false;
+    dashboard.dataset.mobileView = 'edit';
+
+    if (mobileViewport.matches) focusMobileView(editBackButton);
+    else editFields.firstName.focus();
+  }
+
+  function closeEditContact() {
+    dashboard.classList.remove('is-editing');
+    editPanel.hidden = true;
+    dashboard.dataset.mobileView = 'detail';
+    editStatus.textContent = '';
+
+    requestAnimationFrame(() => editButton.focus({ preventScroll: true }));
+  }
+
+  // The decorative spacer fills any unused list height. Once a full list is
+  // scrolled to its end, contract the Add Contact divider to the inset style.
+  function syncContactListFillState() {
+    const isFull = contactListSpacer.getBoundingClientRect().height < 1;
+    const distanceFromBottom = contactListScroll.scrollHeight
+      - contactListScroll.clientHeight
+      - contactListScroll.scrollTop;
+    const isAtTop = contactListScroll.scrollTop <= 1;
+    const isAtBottom = distanceFromBottom <= 1;
+
+    contactListScroll.classList.toggle('is-full', isFull);
+    contactListSearch.classList.toggle('is-list-start', isAtTop);
+    contactListAdd.classList.toggle('is-list-end', isFull && isAtBottom);
+  }
+
+  contactListScroll.addEventListener('scroll', syncContactListFillState, { passive: true });
+
+  const contactListResizeObserver = new ResizeObserver(syncContactListFillState);
+  contactListResizeObserver.observe(contactListScroll);
+  contactListResizeObserver.observe(contactList);
+  contactListResizeObserver.observe(contactListSpacer);
+
+  // One cloned template item per contact.
+  function renderList() {
+    for (const entry of contactList.querySelectorAll('.contact-list-entry')) entry.remove();
+
+    for (const contact of contacts) {
+      const entry = itemTemplate.content.firstElementChild.cloneNode(true);
+      const button = entry.querySelector('.contact-list-item');
+      button.dataset.contactId = contact.ID;
+      button.querySelector('.contact-list-avatar').textContent = initials(contact);
+      button.querySelector('.contact-list-name-text').textContent = fullName(contact);
+
+      if (Number(contact.ID) === Number(selectedContactId)) {
+        button.classList.add('is-active');
+        button.setAttribute('aria-current', 'true');
+      }
+
+      contactList.append(entry);
+    }
+
+    syncContactListFillState();
+  }
+
+  contactList.addEventListener('click', (event) => {
+    const button = event.target.closest('.contact-list-item');
+    if (!button) return;
+
+    const contact = contacts.find((candidate) =>
+      Number(candidate.ID) === Number(button.dataset.contactId));
+    if (contact) openContact(contact, button);
+  });
+
+  addButton.addEventListener('click', () => openAddContact(addButton));
+  detailsBackButton.addEventListener('click', returnToContactList);
+  addBackButton.addEventListener('click', returnToContactList);
+  editButton.addEventListener('click', openEditContact);
+  editBackButton.addEventListener('click', closeEditContact);
+  cancelEditButton.addEventListener('click', closeEditContact);
+
+  mobileViewport.addEventListener('change', (event) => {
+    if (!event.matches) return;
+
+    dashboard.dataset.mobileView = 'list';
+    dashboard.classList.remove('is-adding');
+    dashboard.classList.remove('is-editing');
+    editPanel.hidden = true;
+    contactListAdd.classList.remove('is-active');
+  });
 
   // Hidden entirely when the user has no contacts yet.
   function renderDetails() {
     detailsView.hidden = !selectedContact;
     if (!selectedContact) {
       delete deleteButton.dataset.contactId;
+      editPanel.hidden = true;
       return;
     }
 
@@ -279,21 +465,41 @@ function startDashboard() {
     else view.created.removeAttribute('datetime');
   }
 
+  function requestHeaders(includeJson = false) {
+    const headers = { 'X-User-Id': String(userId) };
+    if (includeJson) headers['Content-Type'] = 'application/json; charset=UTF-8';
+    return headers;
+  }
+
+  async function responseData(response) {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || `Request failed with status ${response.status}`);
+    }
+    return data;
+  }
+
+  function formContact(form) {
+    const data = new FormData(form);
+    return {
+      firstName: String(data.get('first_name') ?? '').trim(),
+      lastName: String(data.get('last_name') ?? '').trim(),
+      email: String(data.get('email') ?? '').trim(),
+      phone: String(data.get('phone') ?? '').trim(),
+    };
+  }
+
+  function sortContacts() {
+    contacts.sort((first, second) =>
+      (first.LastName ?? '').localeCompare(second.LastName ?? '')
+      || (first.FirstName ?? '').localeCompare(second.FirstName ?? ''));
+  }
+
   // The API sorts the rows, so the first contact is the one the card opens on.
   async function loadContacts() {
-    // if (!signedIn()) {
-    //   window.location.replace('index.html');
-    //   return;
-    // }
-
     try {
-      // const response = await fetch('api/index.php');
-      // if (response.status === 401) {
-      //   window.location.replace('index.html');
-      //   return;
-      // }
-      // if (!response.ok) throw new Error(`Contacts request failed: ${response.status}`);
-      // contacts = await response.json();
+      const response = await fetch(urlBase, { headers: requestHeaders() });
+      contacts = await responseData(response);
     } catch (error) {
       console.error(error);
       status.textContent = 'Could not load contacts';
@@ -306,6 +512,86 @@ function startDashboard() {
     renderList();
     renderDetails();
   }
+
+  editForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!selectedContact || !editForm.reportValidity()) return;
+
+    const contact = formContact(editForm);
+    const hasChanges = contact.firstName !== (selectedContact.FirstName ?? '')
+      || contact.lastName !== (selectedContact.LastName ?? '')
+      || contact.email !== (selectedContact.Email ?? '')
+      || contact.phone !== (selectedContact.Phone ?? '');
+
+    if (!hasChanges) {
+      closeEditContact();
+      return;
+    }
+
+    const submitButton = editForm.querySelector('[type="submit"]');
+    submitButton.disabled = true;
+    editStatus.textContent = 'Saving changes…';
+
+    try {
+      const response = await fetch(`${urlBase}?id=${selectedContact.ID}`, {
+        method: 'PUT',
+        headers: requestHeaders(true),
+        body: JSON.stringify(contact),
+      });
+      const updatedContact = await responseData(response);
+      selectedContact = { ...selectedContact, ...updatedContact };
+      selectedContactId = selectedContact.ID;
+      contacts = contacts.map((candidate) =>
+        Number(candidate.ID) === Number(selectedContact.ID) ? selectedContact : candidate);
+      sortContacts();
+      renderList();
+      renderDetails();
+      closeEditContact();
+    } catch (error) {
+      console.error(error);
+      editStatus.textContent = error.message || 'Could not save this contact.';
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+
+  addForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!addForm.reportValidity()) return;
+
+    const submitButton = addForm.querySelector('[type="submit"]');
+    submitButton.disabled = true;
+    addStatus.textContent = 'Adding contact…';
+
+    try {
+      const response = await fetch(urlBase, {
+        method: 'POST',
+        headers: requestHeaders(true),
+        body: JSON.stringify(formContact(addForm)),
+      });
+      const newContact = await responseData(response);
+      selectedContact = {
+        Created: new Date().toISOString(),
+        ...newContact,
+      };
+      selectedContactId = selectedContact.ID;
+      contacts.push(selectedContact);
+      sortContacts();
+      addForm.reset();
+      addStatus.textContent = '';
+      dashboard.classList.remove('is-adding');
+      contactListAdd.classList.remove('is-active');
+      dashboard.dataset.mobileView = 'detail';
+      renderList();
+      renderDetails();
+      focusMobileView(detailsBackButton);
+    } catch (error) {
+      console.error(error);
+      addStatus.textContent = error.message || 'Could not add this contact.';
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
 
   // Copy buttons on the details card.
   document.addEventListener('click', async (event) => {
@@ -329,30 +615,91 @@ function startDashboard() {
     button.resetTimer = setTimeout(() => button.classList.remove('is-copied'), 1500);
   });
 
-  deleteButton.addEventListener('click', async () => {
+  function setDeleteDialogBusy(isBusy) {
+    deleteDialog.toggleAttribute('data-busy', isBusy);
+    confirmDeleteButton.disabled = isBusy;
+    cancelDeleteButton.disabled = isBusy;
+  }
+
+  deleteButton.addEventListener('click', () => {
     const contactId = deleteButton.dataset.contactId;
 
-    if (!contactId) {
-        return;
+    if (!contactId || !selectedContact) return;
+
+    deleteDialog.dataset.contactId = contactId;
+    deleteDialogContactName.textContent = fullName(selectedContact);
+    deleteDialogStatus.textContent = '';
+    deleteDialogStatus.classList.remove('is-error');
+    deleteDialog.returnValue = '';
+    setDeleteDialogBusy(false);
+    deleteDialog.showModal();
+  });
+
+  deleteDialog.addEventListener('cancel', (event) => {
+    if (deleteDialog.hasAttribute('data-busy')) {
+      event.preventDefault();
     }
+  });
 
-    const confirmed = confirm('Are you sure you want to delete this contact?');
+  deleteDialog.addEventListener('click', (event) => {
+    if (deleteDialog.hasAttribute('data-busy')) return;
 
-    if (!confirmed) {
-        return;
+    const bounds = deleteDialog.getBoundingClientRect();
+    const clickedBackdrop = event.clientX < bounds.left
+      || event.clientX > bounds.right
+      || event.clientY < bounds.top
+      || event.clientY > bounds.bottom;
+
+    if (clickedBackdrop) deleteDialog.close('cancel');
+  });
+
+  deleteDialog.addEventListener('close', () => {
+    const shouldRestoreFocus = deleteDialog.returnValue !== 'deleted'
+      && dashboard.classList.contains('is-editing');
+
+    delete deleteDialog.dataset.contactId;
+    deleteDialogStatus.textContent = '';
+    deleteDialogStatus.classList.remove('is-error');
+    setDeleteDialogBusy(false);
+
+    if (shouldRestoreFocus) {
+      requestAnimationFrame(() => deleteButton.focus({ preventScroll: true }));
     }
+  });
 
-    const response = await fetch(`api/index.php?id=${contactId}`, {
+  confirmDeleteButton.addEventListener('click', async () => {
+    const contactId = deleteDialog.dataset.contactId;
+    if (!contactId) return;
+
+    setDeleteDialogBusy(true);
+    deleteDialogStatus.classList.remove('is-error');
+    deleteDialogStatus.textContent = 'Deleting contact…';
+
+    try {
+      const response = await fetch(`${urlBase}?id=${contactId}`, {
         method: 'DELETE',
-    });
+        headers: requestHeaders(),
+      });
+      await responseData(response);
 
-    const data = await response.json();
+      contacts = contacts.filter((contact) => Number(contact.ID) !== Number(contactId));
+      selectedContact = contacts[0] ?? null;
+      selectedContactId = selectedContact?.ID ?? null;
+      dashboard.classList.remove('is-editing');
+      editPanel.hidden = true;
+      dashboard.dataset.mobileView = mobileViewport.matches ? 'list' : 'detail';
+      renderList();
+      renderDetails();
 
-    if (response.ok) {
-        alert('Contact deleted successfully.');
-        window.location.reload();
-    } else {
-        alert(data.error || 'Failed to delete contact.');
+      if (mobileViewport.matches) returnToContactList();
+
+      deleteDialog.close('deleted');
+    } catch (error) {
+      console.error(error);
+      deleteDialogStatus.classList.add('is-error');
+      deleteDialogStatus.textContent = error.message || 'Could not delete this contact.';
+    } finally {
+      setDeleteDialogBusy(false);
     }
   });
 
