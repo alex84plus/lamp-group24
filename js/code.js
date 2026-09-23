@@ -392,7 +392,7 @@ function startDashboard() {
   contactListResizeObserver.observe(contactListSpacer);
 
   // One cloned template item per contact.
-  function renderList() {
+  function renderList(list = contacts) {
     for (const entry of contactList.querySelectorAll('.contact-list-entry')) entry.remove();
 
     for (const contact of contacts) {
@@ -412,6 +412,23 @@ function startDashboard() {
 
     syncContactListFillState();
   }
+
+    contactListSearch.addEventListener('input', (event) => {
+    const query = event.target.value.trim().toLowerCase();
+    console.log('search input:', query);
+    const filteredContacts = contacts.filter((contact) =>{
+      const firstName = (contact.FirstName ?? '').toLowerCase();
+      const lastName = (contact.LastName ?? '').toLowerCase();
+      const fullName = `${firstName} ${lastName}`;
+      return (
+        firstName.includes(query) ||
+        lastName.includes(query) ||
+        fullName.includes(query)
+      );
+    });
+    console.log('filtered:', filteredContacts);
+    renderList(filteredContacts);
+  });
 
   contactList.addEventListener('click', (event) => {
     const button = event.target.closest('.contact-list-item');
@@ -496,8 +513,12 @@ function startDashboard() {
   }
 
   // The API sorts the rows, so the first contact is the one the card opens on.
-  async function loadContacts() {
+  async function loadContacts(search = '') {
     try {
+      let url = urlBase;
+      if (search.trim() !== ''){
+        url.searchParams.set('q', search.trim());
+      }
       const response = await fetch(urlBase, { headers: requestHeaders() });
       contacts = await responseData(response);
     } catch (error) {
