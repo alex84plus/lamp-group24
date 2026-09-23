@@ -23,7 +23,7 @@ if (!$login || !$password) {
 $db = getDB();
 
 $stmt = $db->prepare(
-    'SELECT ID, FirstName, LastName
+    'SELECT ID, FirstName, LastName, Role, IsDisabled
      FROM Users
      WHERE Login = ? AND Password = ?
      LIMIT 1'
@@ -38,11 +38,21 @@ if (!$user) {
     exit;
 }
 
+if((bool)$user['IsDisabled']){
+    header('Location: ../index.html?error=disabled');
+    exit;
+}
+
 $_SESSION['userId'] = (int)$user['ID'];
 $_SESSION['firstName'] = $user['FirstName'];
 $_SESSION['lastName'] = $user['LastName'];
+$_SESSION['role'] = $user['Role'];
 
 setcookie('userId', (string)$user['ID'], 0, '/');
+
+if($_SESSION['role'] === 'ADMIN'){
+    header('Location: ../admin.html');
+}
 
 header('Location: ../dashboard.html');
 exit;
