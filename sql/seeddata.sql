@@ -3,7 +3,7 @@ USE `ContactManagerDB`;
 
 -- Sample Users
 
-INSERT INTO `Users` (`FirstName`, `LastName`, `Login`, `Password`, `Role`, `IsVerified`) VALUES
+INSERT INTO `Users` (`FirstName`, `LastName`, `Email, `Login`, `Password`, `Role`, `IsVerified`) VALUES
   -- Default Admin Account
 ('Application', 'Administrator', 'admin@monkeymail.com', 'root', 'admin67', 'Admin', TRUE), 
 
