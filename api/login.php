@@ -46,12 +46,13 @@ if((bool)$user['IsDisabled']){
 $_SESSION['userId'] = (int)$user['ID'];
 $_SESSION['firstName'] = $user['FirstName'];
 $_SESSION['lastName'] = $user['LastName'];
-$_SESSION['role'] = $user['Role'];
+$_SESSION['role'] = strtoupper($user['Role']);
 
 setcookie('userId', (string)$user['ID'], 0, '/');
 
 if($_SESSION['role'] === 'ADMIN'){
     header('Location: ../admin.html');
+    exit;
 }
 
 header('Location: ../dashboard.html');
