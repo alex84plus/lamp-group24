@@ -100,23 +100,17 @@ if ($method === 'POST')
         // best way I can understand this is that stmt loads up a command from the database
         // and uses variables to execute it on the next line, at that point, stmt should be
         // able to fetch that user if it exists, and so we put it into user
-        $stmt = $db->prepare('SELECT ID, firstName, lastName, Role, IsDisabled 
-            FROM Users WHERE Login = :login AND Password = :pass LIMIT 1');
+        $stmt = $db->prepare('SELECT ID, firstName, lastName, FROM Users WHERE Login = :login AND Password = :pass LIMIT 1');
         $stmt->execute([':login' => $login, ':pass' => $password]);
         $user = $stmt->fetch();
 
         // if user exists, send OK 200, if not, 401
         if ($user)
         {
-
-            if((bool)$user['IsDisabled']){
-                respond(403, ['error' => 'This account has been disabled']);
-            }
             respond(200, [
                 'id'        => (int) $user['ID'],
                 'firstName' => $user['firstName'],
                 'lastName'  => $user['lastName'],
-                'role'      => strtoupper($user['Role']),
                 'token'     => (string) $user['ID'],
                 'error'     => ''
             ]);
@@ -127,7 +121,6 @@ if ($method === 'POST')
                 'id'        => 0,
                 'firstName' => '',
                 'lastName'  => '',
-                'role'      => '',
                 'error'     => 'No Records Found'
             ]);
         }
