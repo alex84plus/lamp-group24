@@ -165,16 +165,19 @@ if ($method === 'GET')
             'SELECT ID, FirstName, LastName, Phone, Email, Created
              FROM Contacts
              WHERE UserID = :uid
-             AND (
-                 FirstName LIKE :searchTerm
-                 OR LastName LIKE :searchTerm
-                 OR Phone LIKE :searchTerm
-                 OR Email LIKE :searchTerm
-             )
+             AND ( FirstName LIKE :st1
+                   OR LastName LIKE :st2
+                   OR Phone LIKE :st3
+                   OR Email LIKE :st4 )
              ORDER BY LastName, FirstName'
         );
 
-        $stmt->execute( [':uid' => $userId, ':searchTerm' => $searchTerm ]);
+        $stmt->execute( [':uid' => $userId,
+                         ':st1' => $searchTerm,
+                         ':st2' => $searchTerm,
+                         ':st3' => $searchTerm,
+                         ':st4' => $searchTerm
+        ]);
     }
     else
     {
