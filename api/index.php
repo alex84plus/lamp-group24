@@ -218,15 +218,15 @@ if ($method === 'POST')
     $stmt = $db->prepare(
         'INSERT INTO Contacts
          (FirstName, LastName, UserID, Phone, Email)
-         VALUES (?, ?, ?, ?, ?)'
+         VALUES (:firstName, :lastName, :uid, :phone, :email)'
     );
 
     $stmt->execute([
-        $firstName,
-        $lastName,
-        $userId,
-        $phone,
-        $email
+        ':firstName' => $firstName,
+        ':lastName'  => $lastName,
+        ':uid'       => $userId,
+        ':phone'     => $phone,
+        ':email'     => $email
     ]);
 
     $contactId = $db->lastInsertId();
