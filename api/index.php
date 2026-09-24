@@ -132,19 +132,19 @@ $userId = requireAuth();
 // 3. Get contacts for authenticated user
 if ($method === 'GET')
 {
-    // Get one contact by ID
-    if (isset($_GET['id']))
-    {
-        $contactId = (int) $_GET['id'];
+    $contactId = isset($_GET['id']) ? (int) $_GET['id'] : null;
+    $search    = isset($_GET['q'])  ? trim($_GET['q'])  : (isset($_GET['search']) ? trim($_GET['search']) : null);
 
+    // Get one contact by ID
+    if ( $contactId )
+    {
         $stmt = $db->prepare(
             'SELECT ID, FirstName, LastName, Phone, Email, Created
              FROM Contacts
-             WHERE ID = ? AND UserID = ?
+             WHERE ID = :cid AND UserID = :uid
              LIMIT 1'
         );
-
-        $stmt->execute([$contactId, $userId]);
+        $stmt->execute([':cid' => $contactId, ':uid' => $userId]);
 
         $contact = $stmt->fetch();
 
@@ -157,47 +157,44 @@ if ($method === 'GET')
     }
 
     // Search contacts
-    $search = isset($_GET['q']) ? clean($_GET['q']) : '';
-
-    if ($search !== '')
+    if ( $search !== null && $search !== '' )
     {
+        $searchTerm = '%' . $search . '%';
+
         $stmt = $db->prepare(
             'SELECT ID, FirstName, LastName, Phone, Email, Created
              FROM Contacts
-             WHERE UserID = ?
+             WHERE UserID = :uid
              AND (
-                 FirstName LIKE ?
-                 OR LastName LIKE ?
-                 OR Phone LIKE ?
-                 OR Email LIKE ?
+                 FirstName LIKE :searchTerm
+                 OR LastName LIKE :searchTerm
+                 OR Phone LIKE :searchTerm
+                 OR Email LIKE :searchTerm
              )
              ORDER BY LastName, FirstName'
         );
 
-        $searchTerm = '%' . $search . '%';
-
-        $stmt->execute([
-            $userId,
-            $searchTerm,
-            $searchTerm,
-            $searchTerm,
-            $searchTerm
-        ]);
+        $stmt->execute( [':uid' => $userId, ':searchTerm' => $searchTerm ]);
     }
     else
     {
         $stmt = $db->prepare(
             'SELECT ID, FirstName, LastName, Phone, Email, Created
              FROM Contacts
-             WHERE UserID = ?
+             WHERE UserID = :uid
              ORDER BY LastName, FirstName'
         );
 
-        $stmt->execute([$userId]);
+        $stmt->execute( [':uid' =>$userId] );
     }
 
     $contacts = $stmt->fetchAll();
-    respond(200, $contacts);
+    $results = array_column($contacts, 'name');
+    if (empty($results)) {
+        respond(200, ['results' => [], 'contacts' => [], 'error' => 'No Records Found']);
+    }
+    respond(200, ['results' => $results, 'contacts' => $contacts, 'error' => '']);
+
 }
 
 // 4. Create a new contact
