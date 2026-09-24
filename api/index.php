@@ -241,45 +241,45 @@ if ($method === 'POST')
 }
 
 // 5. Update a contact
-if ($method === 'PUT')
+if ( $method === 'PUT' )
 {
-    if (!isset($_GET['id']))
+    $contactId = isset( $_GET['id'] ) ? ( int ) $_GET['id'] : 0;
+    if ( $contactId )
     {
-        respond(400, ['error' => 'Contact ID is required']);
+        respond(400, ['error' => 'Contact ID is required — use ?id=']);
     }
 
-    $contactId = (int) $_GET['id'];
+    $check = $db->prepare( 'SELECT ID FROM Contacts WHERE ID = :id AND UserID = :uid LIMIT 1' );
+    $check->execute( [':contactId' => $contactId, ':uid' => $userId] );
+    if (!$check->fetch()) {
+        respond( 404, ['error' => "Monke couldn't find the Contact"] );
+    }
+
     $body = getRequestBody();
+    $firstName = clean( $body['firstName'] ?? '' );
+    $lastName  = clean( $body['lastName'] ?? '' );
+    $phone     = clean( $body['phone'] ?? '' );
+    $email     = clean( $body['email'] ?? '' );
 
-    $firstName = clean($body['firstName'] ?? '');
-    $lastName  = clean($body['lastName'] ?? '');
-    $phone     = clean($body['phone'] ?? '');
-    $email     = clean($body['email'] ?? '');
-
-    if (!$firstName || !$lastName)
+    if ( !$firstName || !$lastName )
     {
-        respond(400, ['error' => 'First name and last name are required']);
+        respond( 400, ['error' => 'First name and last name are required'] );
     }
 
     $stmt = $db->prepare(
         'UPDATE Contacts
-         SET FirstName = ?, LastName = ?, Phone = ?, Email = ?
-         WHERE ID = ? AND UserID = ?'
+         SET FirstName = :firstName, LastName = :lastName, Phone = :phone, Email = :email
+         WHERE ID = :cid AND UserID = :uid
+         LIMIT 1'
     );
-
     $stmt->execute([
-        $firstName,
-        $lastName,
-        $phone,
-        $email,
-        $contactId,
-        $userId
+        ':firstName' => $firstName,
+        ':lastName'  => $lastName,
+        ':phone'     => $phone,
+        ':email'     => $email,
+        ':cid'       => $contactId,
+        ':uid'       => $userId
     ]);
-
-    if ($stmt->rowCount() === 0)
-    {
-     respond(404, ['error' => "Monke couldn't find the Contact"]);
-    }
 
     respond(200, [
         'ID'        => $contactId,
