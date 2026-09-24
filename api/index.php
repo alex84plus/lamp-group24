@@ -189,8 +189,8 @@ if ($method === 'GET')
     }
 
     $contacts = $stmt->fetchAll();
-    $results = array_column($contacts, 'name');
-    if (empty($results)) {
+    $results = array_column($contacts, 'FirstName');
+    if ( empty($results) ) {
         respond(200, ['results' => [], 'contacts' => [], 'error' => 'No Records Found']);
     }
     respond(200, ['results' => $results, 'contacts' => $contacts, 'error' => '']);
