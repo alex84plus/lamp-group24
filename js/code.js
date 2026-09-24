@@ -395,7 +395,7 @@ function startDashboard() {
   function renderList(list = contacts) {
     for (const entry of contactList.querySelectorAll('.contact-list-entry')) entry.remove();
 
-    for (const contact of contacts) {
+    for (const contact of list) {
       const entry = itemTemplate.content.firstElementChild.cloneNode(true);
       const button = entry.querySelector('.contact-list-item');
       button.dataset.contactId = contact.ID;
