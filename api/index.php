@@ -250,9 +250,9 @@ if ( $method === 'PUT' )
     }
 
     $check = $db->prepare( 'SELECT ID FROM Contacts WHERE ID = :id AND UserID = :uid LIMIT 1' );
-    $check->execute( [':contactId' => $contactId, ':uid' => $userId] );
+    $check->execute( [':id' => $contactId, ':uid' => $userId] );
     if (!$check->fetch()) {
-        respond( 404, ['error' => "Monke couldn't find the Contact"] );
+        respond( 404, ['error' => 'Monke couldn\'t find the Contact'] );
     }
 
     $body = getRequestBody();
