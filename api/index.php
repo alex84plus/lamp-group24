@@ -244,7 +244,7 @@ if ($method === 'POST')
 if ( $method === 'PUT' )
 {
     $contactId = isset( $_GET['id'] ) ? ( int ) $_GET['id'] : 0;
-    if ( $contactId )
+    if ( !$contactId )
     {
         respond(400, ['error' => 'Contact ID is required — use ?id=']);
     }
