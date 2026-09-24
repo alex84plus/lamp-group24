@@ -291,31 +291,26 @@ if ( $method === 'PUT' )
 }
 
 // 6. Delete a contact
-if ($method === 'DELETE')
+if ( $method === 'DELETE' )
 {
-    if (!isset($_GET['id']))
+    $contactId   = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+    $name = isset($_GET['name']) ? clean($_GET['name']) : '';
+
+    if ($id > 0) {
+        $stmt = $db->prepare('DELETE FROM Contacts WHERE ID = :cid AND UserID = :uid');
+        $stmt->execute([':cid' => $contactId, ':uid' => $userId]);
+    }
+    else
     {
-        respond(400, ['error' => 'Contact ID is required']);
+        respond( 400, ['error' => 'Contact ID is required — use ?id='] );
     }
 
-    $contactId = (int) $_GET['id'];
-
-    $stmt = $db->prepare(
-        'DELETE FROM Contacts
-         WHERE ID = ? AND UserID = ?'
-    );
-
-    $stmt->execute([
-        $contactId,
-        $userId
-    ]);
-
-    if ($stmt->rowCount() === 0)
+    if ( $stmt->rowCount() === 0 )
     {
-        respond(404, ['error' => "Monke couldn't find the Contact"]);
+        respond( 404, ['error' => "Monke couldn't find the Contact"] );
     }
 
-    respond(200, [
-        'message' => 'Monke deleted Contact successfully'
-    ]);
+    respond( 200, ['message' => 'Monke deleted Contact successfully'] );
 }
+
+respond(405, ['error' => 'Method not allowed']);
