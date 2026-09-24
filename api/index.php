@@ -294,9 +294,8 @@ if ( $method === 'PUT' )
 if ( $method === 'DELETE' )
 {
     $contactId   = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-    $name = isset($_GET['name']) ? clean($_GET['name']) : '';
 
-    if ($id > 0) {
+    if ($contactId > 0) {
         $stmt = $db->prepare('DELETE FROM Contacts WHERE ID = :cid AND UserID = :uid');
         $stmt->execute([':cid' => $contactId, ':uid' => $userId]);
     }
