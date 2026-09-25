@@ -520,7 +520,9 @@ function startDashboard() {
         url.searchParams.set('q', search.trim());
       }
       const response = await fetch(urlBase, { headers: requestHeaders() });
-      contacts = await responseData(response);
+      const data = await responseData(response);
+
+      contacts = data.contacts ?? [];
     } catch (error) {
       console.error(error);
       status.textContent = 'Could not load contacts';
