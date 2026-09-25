@@ -133,6 +133,10 @@ function doLogin() {
           lastName = jsonObject.lastName;
 
           saveCookie();
+          if (jsonObject.role === "ADMIN") {
+            window.location.href = "admin.html";
+            return;
+          }
           window.location.href = "dashboard.html";
         } else {
           document.getElementById("login-error").innerHTML =
