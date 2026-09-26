@@ -139,14 +139,50 @@ function doLogin() {
           }
           window.location.href = "dashboard.html";
         } else {
-          document.getElementById("login-error").innerHTML =
-            "Login failed";
+          showLoginError(this);
         }
       }
     };
     xhr.send(jsonPayload);
   } catch (err) {
     document.getElementById("login-error").innerHTML = err.message;
+  }
+}
+
+// Shows why the login request in xhr failed, under the Remember Me row. The
+// API turns down a wrong username or password with 401 and explains any other
+// refusal, such as a disabled account, in its error text.
+function showLoginError(xhr) {
+  const error = document.getElementById('login-error');
+  let message = 'Login failed';
+
+  if (xhr.status === 401) {
+    message = 'That username and password do not match.';
+  } else if (xhr.status === 0) {
+    message = 'Could not reach the server. Try again.';
+  } else {
+    try {
+      message = JSON.parse(xhr.responseText).error || message;
+    } catch {
+      // Not the API's JSON, so the general message stands.
+    }
+  }
+
+  error.textContent = message;
+  error.hidden = false;
+}
+
+// Everything on index.html besides the request itself, which the form's
+// onsubmit sends through doLogin(). An error is about the last attempt, so it
+// goes as soon as a field changes or the form is sent again.
+function startLogin() {
+  const form = document.getElementById('login-form');
+  const error = document.getElementById('login-error');
+
+  for (const type of ['input', 'submit']) {
+    form.addEventListener(type, () => {
+      error.hidden = true;
+    });
   }
 }
 
