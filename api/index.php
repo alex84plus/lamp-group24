@@ -54,11 +54,12 @@ if ($method === 'POST')
         $password  = clean( $body['password'] );
         $firstName = clean( $body['firstName'] );
         $lastName  = clean( $body['lastName'] );
+        $email     = clean( $body['email'] ?? '' );
 
         //check all our data is actually defined
-        if ( !$login || !$password || !$firstName || !$lastName )
+        if ( !$login || !$password || !$firstName || !$lastName || !$email )
         {
-            respond( 400, ['error' => 'Login, Password, First Name, and Last Name are required'] );
+            respond( 400, ['error' => 'Login, Password, First Name, Last Name, and Email are required'] );
         }
 
         //check to see if user already exists
@@ -73,10 +74,18 @@ if ($method === 'POST')
         }
         else
         {
+            //check to see if the email is already used by another account
+            $stmt = $db->prepare('SELECT ID FROM Users WHERE Email = :email LIMIT 1');
+            $stmt->execute( [':email' => $email] );
+            if ($stmt->fetch())
+            {
+                respond( 403, ['error' => 'Email Taken'] );
+            }
+
             //create new account
-            $stmt = $db->prepare( 'INSERT INTO Users (FirstName,LastName,Login,Password)
-                                    VALUES (:firstName, :lastName, :login, :password);' );
-            $stmt->execute( [':firstName' => $firstName, ':lastName' => $lastName, ':login' => $login, ':password' => $password ] );
+            $stmt = $db->prepare( 'INSERT INTO Users (FirstName,LastName,Email,Login,Password)
+                                    VALUES (:firstName, :lastName, :email, :login, :password);' );
+            $stmt->execute( [':firstName' => $firstName, ':lastName' => $lastName, ':email' => $email, ':login' => $login, ':password' => $password ] );
 
             respond( 201, ['error' => ''] );
         }

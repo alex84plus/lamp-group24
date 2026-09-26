@@ -6,16 +6,24 @@
         <title>Contact Manager</title>
         <link rel="stylesheet" href="css/style.css">
         <script src="js/site.js" type="module"></script>
-        <script src="js/code.js" type="module"></script>
+        <script src="js/code.js" type="text/javascript"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                startSignup();
+            }, false);
+        </script>
     </head>
-    <body>
+    <body class="signup-page">
         <div class="hero-container">
             <div class="login-container">
                 <div class="login-title">
                     Sign Up for Contact Manager
                 </div>
-                <!-- Sign up form-->
-                <form action="api/signup.php" method="POST">
+                <!-- Sign up form, sent by js/code.js. The names and maxlengths
+                     follow the Users columns in sql/createtables.sql. POST only
+                     so a submit before the script loads never puts the
+                     password in the URL. -->
+                <form id="signup-form" method="POST">
                     <div class="login-form">
                         <!-- First name field-->
                         <input
@@ -24,6 +32,8 @@
                         id="firstName"
                         name="firstName"
                         placeholder="First Name"
+                        maxlength="50"
+                        autocomplete="given-name"
                         required
                         >
                         <!-- Last name field-->
@@ -33,15 +43,30 @@
                         id="lastName"
                         name="lastName"
                         placeholder="Last Name"
+                        maxlength="50"
+                        autocomplete="family-name"
+                        required
+                        >
+                        <!-- Email field-->
+                        <input
+                        class="form-input"
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Email"
+                        maxlength="100"
+                        autocomplete="email"
                         required
                         >
                         <!-- Username field-->
                         <input
                         class="form-input"
                         type="text"
-                        id="username"
-                        name="username"
+                        id="login"
+                        name="login"
                         placeholder="Username"
+                        maxlength="50"
+                        autocomplete="username"
                         required
                         >
                         <!-- Password field-->
@@ -51,13 +76,21 @@
                         id="password"
                         name="password"
                         placeholder="Password"
+                        maxlength="255"
+                        autocomplete="new-password"
                         required
                         >
+                        <!-- Why the last attempt failed, filled in by js/code.js-->
+                        <p class="login-error" id="signup-error" role="alert" hidden></p>
                         <!-- Submit button-->
                         <button class="btn-primary" type="submit">Sign Up</button>
                     </div>
                 </form>
             </div>
+            <!-- Login link, under the card-->
+            <p class="login-switch">
+                Already have an account? <a href="index.html">Login</a>
+            </p>
         </div>
     </body>
 </html>

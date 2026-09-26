@@ -213,6 +213,89 @@ function doLogout() {
   window.location.href = "index.html";
 }
 
+// ======
+// signup
+// ======
+
+// Everything on signup.html. The API's signup answers with only a status, so
+// once the account exists this logs in with the same details, the way the
+// login page does, to get the id and name saveCookie() needs.
+function startSignup() {
+  const form = document.getElementById('signup-form');
+  const submitButton = form.querySelector('button[type="submit"]');
+  const error = document.getElementById('signup-error');
+
+  function showError(message) {
+    error.textContent = message;
+    error.hidden = false;
+  }
+
+  // POSTs JSON to the API and returns its reply, throwing the API's own error
+  // text when the status is not OK.
+  async function post(payload) {
+    let response;
+    try {
+      response = await fetch(urlBase, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      throw new Error('Could not reach the server. Try again.');
+    }
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || `Request failed with status ${response.status}`);
+    }
+    return data;
+  }
+
+  // Runs once the browser has checked the required fields, the email format,
+  // and the maxlengths. The button stays disabled while the requests run, which
+  // also stops Enter from sending the form twice.
+  async function submitSignup(event) {
+    event.preventDefault();
+    error.hidden = true;
+
+    const data = new FormData(form);
+    const account = {
+      firstName: String(data.get('firstName') ?? '').trim(),
+      lastName: String(data.get('lastName') ?? '').trim(),
+      email: String(data.get('email') ?? '').trim(),
+      login: String(data.get('login') ?? '').trim(),
+      password: String(data.get('password') ?? ''),
+    };
+
+    submitButton.disabled = true;
+    try {
+      await post(account);
+    } catch (failure) {
+      showError(failure.message);
+      submitButton.disabled = false;
+      return;
+    }
+
+    // The account exists now, so if signing in fails the login page is the
+    // way in, not another signup.
+    try {
+      const user = await post({ login: account.login, password: account.password });
+      userId = user.id;
+      firstName = user.firstName;
+      lastName = user.lastName;
+      saveCookie();
+      window.location.href = 'dashboard.html';
+    } catch {
+      window.location.href = 'index.html';
+    }
+  }
+
+  form.addEventListener('submit', submitSignup);
+  // An error is about the last attempt, so it goes as soon as a field changes.
+  form.addEventListener('input', () => {
+    error.hidden = true;
+  });
+}
+
 // =========
 // dashboard
 // =========

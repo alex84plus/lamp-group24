@@ -285,6 +285,31 @@ a.btn-primary {
     outline-offset: 1px;
 }
 
+/* The sign-up page stacks its card over the "Already have an account?" line,
+   so its hero runs as a column where the login page's runs as a row. */
+.signup-page .hero-container {
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login-switch {
+    margin: 0;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 16px;
+    text-align: center;
+}
+
+.login-switch a {
+    color: var(--primaryText);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.login-switch a:focus-visible {
+    outline: 2px solid var(--focusRing);
+    outline-offset: 1px;
+}
+
 .form-input::placeholder,
 .contact-search-input::placeholder {
     color: var(--secondaryText);
