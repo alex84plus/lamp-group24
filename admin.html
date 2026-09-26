@@ -2,14 +2,166 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/code.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            startAdmin();
+        }, false);
+    </script>
 </head>
 
-<body>
+<body class="admin-page">
 
-    <h1>Admin Dashboard</h1>
+    <nav>
+        <button class="tab active" type="button" data-tab="users-tab" aria-current="page">Users</button>
+        <button class="tab" type="button" data-tab="contacts-tab">Contact entries</button>
+        <button class="btn logout-button" type="button" onclick="doLogout();">Logout</button>
+    </nav>
 
-    <p>Login works! :D</p>
+    <main>
+        <section id="users-tab" aria-label="Users">
+            <div class="toolbar">
+                <!-- Opens the Add user dialog; creating the user is not wired up yet -->
+                <button type="button" class="btn" id="add-user-button">Add user</button>
+                <div class="search-field">
+                    <input type="search" class="text-input" id="user-search" placeholder="Search users" aria-label="Search users" autocomplete="off">
+                    <button type="button" class="close-button search-clear" id="user-search-clear" aria-label="Clear search">&times;</button>
+                </div>
+            </div>
+            <!-- The result of the last row action, until dismissed -->
+            <div class="status-card" id="admin-status-card" hidden>
+                <p id="admin-status" role="status"></p>
+                <button type="button" class="close-button" id="admin-status-close" aria-label="Dismiss message">&times;</button>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-sort="ID" aria-sort="ascending"><button type="button" class="sort-button">ID</button></th>
+                            <th>Login</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Verified</th>
+                            <th>Disabled</th>
+                            <th data-sort="Created" aria-sort="none"><button type="button" class="sort-button">Created</button></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <!-- Rows filled in from api/admin.php?action=users -->
+                    <tbody id="users-table-body"></tbody>
+                </table>
+            </div>
+            <!-- How many users are shown out of all users, filled in by js/code.js -->
+            <p class="table-count" id="user-count" role="status"></p>
+        </section>
+
+        <!-- Every contact and the user who owns it; loaded the first time the tab opens -->
+        <section id="contacts-tab" aria-label="Contact entries" hidden>
+            <div class="toolbar toolbar-end">
+                <!-- The box and the dropdown read as one control -->
+                <div class="search-group">
+                    <div class="search-field">
+                        <input type="search" class="text-input" id="contact-search" placeholder="Search contacts" aria-label="Search contacts" autocomplete="off">
+                        <button type="button" class="close-button search-clear" id="contact-search-clear" aria-label="Clear search">&times;</button>
+                    </div>
+                    <!-- Which column the search looks in; each option sets the box's placeholder -->
+                    <select class="text-input search-in" id="contact-search-field" aria-label="Search in" autocomplete="off">
+                        <option value="all" data-placeholder="Search contacts" selected>All fields</option>
+                        <option value="username" data-placeholder="Search by username">Username</option>
+                        <option value="email" data-placeholder="Search by email">Email</option>
+                        <option value="phone" data-placeholder="Search by phone">Phone</option>
+                        <option value="id" data-placeholder="Search by ID">ID</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-sort="ID" aria-sort="ascending"><button type="button" class="sort-button">ID</button></th>
+                            <th>Owner</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th data-sort="Created" aria-sort="none"><button type="button" class="sort-button">Created</button></th>
+                        </tr>
+                    </thead>
+                    <tbody id="contacts-table-body"></tbody>
+                </table>
+            </div>
+            <p class="table-count" id="contact-count" role="status"></p>
+        </section>
+    </main>
+
+    <!-- Opened by the Reset password row action -->
+    <dialog class="dialog" id="password-dialog">
+        <form id="password-form">
+            <div class="dialog-header">
+                <h3>Reset password</h3>
+                <button type="button" class="close-button" id="password-close" aria-label="Close">&times;</button>
+            </div>
+            <label>
+                Username
+                <input type="text" class="text-input" name="username" autocomplete="username" readonly>
+            </label>
+            <label>
+                New password
+                <input type="password" class="text-input" name="password" required autocomplete="new-password" autofocus>
+            </label>
+            <div class="dialog-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn" id="password-cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Opened by the Add user button. Creating the user is not wired up yet;
+         see submitAddUser in js/code.js. -->
+    <dialog class="dialog" id="add-user-dialog">
+        <form id="add-user-form">
+            <div class="dialog-header">
+                <h3>Add user</h3>
+                <button type="button" class="close-button" id="add-user-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="field-row">
+                <label>
+                    First name
+                    <input type="text" class="text-input" name="firstName" required maxlength="50" autocomplete="off" autofocus>
+                </label>
+                <label>
+                    Last name
+                    <input type="text" class="text-input" name="lastName" required maxlength="50" autocomplete="off">
+                </label>
+            </div>
+            <label>
+                Email
+                <input type="email" class="text-input" name="email" maxlength="100" autocomplete="off">
+            </label>
+            <label>
+                Login
+                <input type="text" class="text-input" name="login" required maxlength="50" autocomplete="off">
+            </label>
+            <label>
+                Password
+                <input type="password" class="text-input" name="password" required autocomplete="new-password">
+            </label>
+            <label>
+                Role
+                <select class="text-input" name="role">
+                    <option value="USER" selected>User</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+            </label>
+            <div class="dialog-actions">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn" id="add-user-cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
 
 </body>
 </html>

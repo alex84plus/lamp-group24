@@ -1506,3 +1506,392 @@ a.btn-primary {
         display: none;
     }
 }
+
+/* Admin page. Every rule is scoped to .admin-page, the class on admin.html's
+   body, so none of it touches the other pages. The first three rules undo
+   site-wide styles from above that admin doesn't use. */
+body.admin-page {
+    font-family: sans-serif;
+    background-color: revert;
+    color: revert;
+}
+
+.admin-page *,
+.admin-page *::before,
+.admin-page *::after {
+    box-sizing: revert;
+}
+
+.admin-page :is(a, button, input, label, select, summary, textarea) {
+    cursor: revert;
+}
+
+.admin-page nav {
+    display: flex;
+    align-items: center;
+    padding: 0 20px 0 12px;
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+}
+
+/* The active tab gets a dark underline. */
+.admin-page .tab {
+    align-self: stretch;
+    margin-bottom: -1px;
+    padding: 14px 20px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: #6b6b6b;
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-page .tab:hover {
+    color: #333;
+    background: #f2f2f2;
+}
+
+.admin-page .tab.active {
+    background: #e8e8e8;
+    color: #333;
+    font-weight: bold;
+    border-bottom-color: #333;
+}
+
+.admin-page .logout-button {
+    width: auto;
+    margin-left: auto;
+}
+
+.admin-page main {
+    padding: 20px;
+}
+
+.admin-page .table-scroll {
+    overflow-x: auto;
+}
+
+.admin-page table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+}
+
+/* Lines around the table and between rows, none between columns. Cells don't
+   wrap, so on a narrow screen the table scrolls sideways. */
+.admin-page th,
+.admin-page td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* The total under each table. */
+.admin-page .table-count {
+    margin: 8px 0 0;
+    color: #6b6b6b;
+    font-size: 14px;
+    text-align: right;
+}
+
+/* Sortable column headers. The arrow marks the sorted column. */
+.admin-page .sort-button {
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-page .sort-button:focus-visible {
+    outline: 2px solid #333;
+    outline-offset: 2px;
+}
+
+.admin-page th[aria-sort="ascending"] .sort-button::after,
+.admin-page th[aria-sort="descending"] .sort-button::after {
+    margin-left: 4px;
+    color: #6b6b6b;
+    font-size: 12px;
+}
+
+.admin-page th[aria-sort="ascending"] .sort-button::after {
+    content: "\25B2";
+}
+
+.admin-page th[aria-sort="descending"] .sort-button::after {
+    content: "\25BC";
+}
+
+/* Empty values show as "----". */
+.admin-page td.empty-cell {
+    color: #999;
+}
+
+/* Disabled users are greyed out, but their Actions button isn't. */
+.admin-page tr.is-disabled td {
+    color: #6b6b6b;
+    background: #f2f2f2;
+}
+
+/* The Actions menu. js/code.js places it under its button. */
+.admin-page .actions-menu {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    padding: 4px 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.admin-page .actions-menu button {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    border: none;
+    background: none;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.admin-page .actions-menu button:hover {
+    background: #eee;
+}
+
+.admin-page .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* Light buttons: Add user, Actions, and the dialog buttons. */
+.admin-page .btn {
+    padding: 7px 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    color: #333;
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-page .btn:hover {
+    background: #f2f2f2;
+    border-color: #999;
+}
+
+.admin-page .btn:focus-visible {
+    outline: 2px solid #333;
+    outline-offset: 2px;
+}
+
+.admin-page .btn:disabled {
+    background: #fff;
+    border-color: #ccc;
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* The dark button for a dialog's main action. */
+.admin-page .btn-primary,
+.admin-page .btn-primary:disabled {
+    width: auto;
+    border-color: #333;
+    background: #333;
+    color: #fff;
+}
+
+.admin-page .btn-primary:hover {
+    border-color: #555;
+    background: #555;
+}
+
+.admin-page .actions-toggle {
+    padding: 4px 10px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.admin-page .text-input {
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+}
+
+/* Keeps a lone search box on the right. */
+.admin-page .toolbar-end {
+    justify-content: flex-end;
+}
+
+/* The "Search in" dropdown. Selects render 2px taller than inputs, so it
+   gets 1px less padding top and bottom. */
+.admin-page .search-in {
+    width: auto;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+/* The search box and dropdown joined into one control with a single shared
+   border. */
+.admin-page .search-group {
+    display: flex;
+    max-width: 100%;
+}
+
+.admin-page .search-group .search-field {
+    flex: 0 1 240px;
+    min-width: 0;
+}
+
+.admin-page .search-group .search-field .text-input {
+    border-radius: 4px 0 0 4px;
+}
+
+.admin-page .search-group .search-in {
+    flex: none;
+    margin-left: -1px;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Raise the focused half so its focus ring isn't hidden. */
+.admin-page .search-group .text-input:focus {
+    position: relative;
+    z-index: 1;
+}
+
+/* Keep the × above the focused box. */
+.admin-page .search-group .search-clear {
+    z-index: 2;
+}
+
+.admin-page .search-field {
+    position: relative;
+    width: 240px;
+    max-width: 100%;
+}
+
+.admin-page .search-field .text-input {
+    box-sizing: border-box;
+    width: 100%;
+    padding-right: 32px;
+}
+
+/* Hide the browser's clear button; we use our own ×. */
+.admin-page .search-field .text-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.admin-page .search-clear {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+}
+
+.admin-page .search-field .text-input:placeholder-shown + .search-clear {
+    display: none;
+}
+
+/* The Reset password and Add user dialogs. */
+.admin-page .dialog {
+    width: 360px;
+    max-width: calc(100% - 32px);
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.admin-page #add-user-dialog {
+    width: 440px;
+}
+
+.admin-page .dialog::backdrop {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Negative margins cancel the dialog's padding so the header runs edge to
+   edge. */
+.admin-page .dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -20px -20px 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+.admin-page .dialog-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.admin-page .dialog label {
+    display: block;
+    margin-bottom: 16px;
+}
+
+.admin-page .dialog .text-input {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 6px;
+}
+
+/* Read-only fields look inactive. */
+.admin-page .dialog .text-input[readonly] {
+    background: #f2f2f2;
+    color: #6b6b6b;
+}
+
+/* Two fields side by side, like first and last name. */
+.admin-page .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.admin-page .dialog-actions {
+    display: flex;
+    margin-top: 20px;
+    gap: 8px;
+}
+
+.admin-page .status-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: #f3f6fa;
+    border: 1px solid #c9d3e0;
+    border-radius: 4px;
+}
+
+.admin-page .status-card[hidden] {
+    display: none;
+}
+
+.admin-page .status-card p {
+    margin: 0;
+}
+
+/* The × close button on the status card and dialogs. */
+.admin-page .close-button {
+    padding: 0 4px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
