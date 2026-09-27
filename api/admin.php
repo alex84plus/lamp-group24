@@ -232,7 +232,7 @@ if ($method === 'POST' && ($_GET['action'] ?? '') === 'create-user')
         $email,
         $login,
         $password,
-        'ADMIN'
+        $role
     ]);
 
     respond(201, [
@@ -241,6 +241,6 @@ if ($method === 'POST' && ($_GET['action'] ?? '') === 'create-user')
         'LastName' => $lastName,
         'Email' => $email,
         'Login' => $login,
-        'Role' => 'ADMIN'
+        'Role' => $role
     ]);
 }
