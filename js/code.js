@@ -12,6 +12,15 @@ const urlBase = (typeof window !== 'undefined' && window.location &&
 
 const loginUrlBase = urlBase;
 
+const adminUrlBase =
+  (typeof window !== 'undefined' &&
+   window.location &&
+   (window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.origin.includes('alex84plus')))
+    ? '/api/admin.php'
+    : 'http://lamp.alex84plus.xyz/api/admin.php';
+
 // A static page cannot see the PHP session, so api/login.php also leaves a
 // readable userId cookie. This only turns a signed-out visitor around at the
 // door; the API is what keeps one user out of another's contacts.
@@ -873,6 +882,39 @@ function startAdmin() {
   const addUserForm = document.getElementById('add-user-form');
   const tabs = document.querySelectorAll('.tab');
 
+  function adminHeaders(includeJson = false) {
+  const id = currentUserId();
+
+  const headers = {
+    'X-User-Id': String(id)
+  };
+
+  if (includeJson) {
+    headers['Content-Type'] = 'application/json; charset=UTF-8';
+  }
+
+  return headers;
+}
+
+async function adminRequest(url, options = {}) {
+  let response;
+
+  try {
+    response = await fetch(url, options);
+  } catch (error) {
+    throw new Error('Could not reach the server.');
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      data.error || `Request failed with status ${response.status}`
+    );
+  }
+
+  return data;
+}
   // The user the password dialog is for, and whether its request is in flight.
   let passwordUser = null;
   let passwordBusy = false;
@@ -1087,7 +1129,22 @@ function startAdmin() {
     // api stuff here
     // set users to the array from GET action=users, adding
     // q=<search> when searching.
-    const users = [];
+    try {
+    const params = new URLSearchParams({
+      action: 'users'
+    });
+
+    if (search) {
+      params.set('q', search);
+    }
+
+    const users = await adminRequest(
+      `${adminUrlBase}?${params.toString()}`,
+      {
+        method: 'GET',
+        headers: adminHeaders()
+      }
+    );
 
     if (request !== latestUsersRequest) return;
     if (!search) totalUsers = users.length;
@@ -1103,7 +1160,17 @@ function startAdmin() {
       return;
     }
     renderUsers();
+  } catch (error) {
+    console.error('Admin users request failed:', error);
+
+    if (request !== latestUsersRequest) {
+      return;
+    }
+
+    showStatus(usersBody, error.message || 'Could not load users.');
+    userCount.textContent = '';
   }
+}
 
   // How an owner is shown in the Owner column and matched by the search, so the
   // two agree.
@@ -1183,9 +1250,26 @@ function startAdmin() {
     // set users to the array from GET action=users, and lists to
     // each user's contacts from GET action=contacts&userId=<ID>, in the same
     // order as users.
-    const users = [];
-    const lists = [];
+    try {
+    const users = await adminRequest(
+      `${adminUrlBase}?action=users`,
+      {
+        method: 'GET',
+        headers: adminHeaders()
+      }
+    );
 
+    const lists = await Promise.all(
+      users.map((user) =>
+        adminRequest(
+          `${adminUrlBase}?action=contacts&userId=${encodeURIComponent(user.ID)}`,
+          {
+            method: 'GET',
+            headers: adminHeaders()
+          }
+        )
+      )
+    );
     // Pairs each contact with its owner; lists[i] holds users[i]'s contacts.
     loadedContacts = [];
     users.forEach((user, i) => {
@@ -1198,7 +1282,17 @@ function startAdmin() {
     } else {
       renderContacts();
     }
+  } catch (error) {
+    console.error('Admin contacts request failed:', error);
+
+    showStatus(
+      contactsBody,
+      error.message || 'Could not load contacts.'
+    );
+
+    contactCount.textContent = '';
   }
+}
 
   // Stores the API's answer and redraws the table from memory, so nothing is
   // fetched again and the rows keep their order.
@@ -1208,15 +1302,45 @@ function startAdmin() {
     // api stuff here
     // set result to the answer from PUT action=disable&id=<user.ID>
     // with the body { disabled }.
-    const result = { IsDisabled: disabled };
+    try {
+    const result = await adminRequest(
+      `${adminUrlBase}?action=disable&id=${encodeURIComponent(user.ID)}`,
+      {
+        method: 'PUT',
+        headers: adminHeaders(true),
+        body: JSON.stringify({
+          disabled: disabled
+        })
+      }
+    );
 
     const isDisabled = Boolean(result.IsDisabled);
     loadedUsers = loadedUsers.map((u) => (u.ID === user.ID ? { ...u, IsDisabled: isDisabled } : u));
+    loadedContacts = loadedContacts.map((entry) =>
+      Number(entry.owner.ID) === Number(user.ID)
+        ? {
+            ...entry,
+            owner: {
+              ...entry.owner,
+              IsDisabled: isDisabled
+            }
+          }
+        : entry
+    );
     renderUsers();
+    if (loadedContacts.length > 0) {
+      renderContacts();
+    }
     // Redrawing replaced every row, so focus goes to this user's new toggle.
     usersBody.querySelector(`[data-user-id="${user.ID}"] .actions-toggle`).focus();
     setPageStatus(`${user.Login} is now ${isDisabled ? 'disabled' : 'enabled'}.`);
+  } catch (error) {
+    console.error('Disable request failed:', error);
+    setPageStatus(error.message || 'Could not update user.');
+
+    toggle.disabled = false;
   }
+}
 
   function setPasswordBusy(busy) {
     passwordBusy = busy;
@@ -1240,38 +1364,105 @@ function startAdmin() {
 
     const { user } = passwordUser;
     const password = event.target.elements.password.value;
+
+    if (!password.trim()) {
+      setPageStatus('Password is required.');
+      return;
+    }
+
     setPasswordBusy(true);
 
     // api stuff here
     // PUT action=password&id=<user.ID> with the body { password }.
-
+    try {
+    await adminRequest(
+      `${adminUrlBase}?action=password&id=${encodeURIComponent(user.ID)}`,
+      {
+        method: 'PUT',
+        headers: adminHeaders(true),
+        body: JSON.stringify({
+          password: password
+        })
+      }
+    );
     setPageStatus(`Password reset for ${user.Login}.`);
-    setPasswordBusy(false);
     passwordDialog.close();
+  } catch (error){
+    console.error('Pass reset failed:', error);
+    setPageStatus(error.message || 'Could not reset pass.');
+  } finally {
+    setPasswordBusy(false);
+  }
   }
 
   function openAddUserDialog() {
     addUserForm.reset();
     addUserDialog.showModal();
   }
+  
+  let addUserBusy = false;
 
+  function setAddUserBusy(busy) {
+    addUserBusy = busy;
+
+   for (const control of addUserForm.querySelectorAll('input, select, button')) {
+      control.disabled = busy;
+    }
+  }
   // Runs once the browser has checked the required fields. The form is done,
   // but nothing is sent yet.
   async function submitAddUser(event) {
     event.preventDefault();
 
-    // api stuff here
-    // create the user from event.target.elements: firstName,
-    // lastName, email, login, password, and role ('USER' or 'ADMIN').
-    //  - ADMIN: POST action=create-admin, which api/admin.php already has.
-    //  - USER: api/admin.php has no action for this yet; add one first.
-    //  - While it runs, disable the form and block Escape, like the password
-    //    dialog does with setPasswordBusy.
-    //  - Success: close the dialog, setPageStatus(`${login} was added.`), and
-    //    loadUsers() with the current search. When searching, also add one to
-    //    totalUsers, since only a load without a search refreshes it.
-    //  - Failure: keep the dialog open and show the error with setPageStatus.
+   if (addUserBusy || !addUserForm.reportValidity()) {
+    return;
   }
+
+  const form = event.target;
+
+  const payload = {
+    firstName: form.elements.firstName.value.trim(),
+    lastName: form.elements.lastName.value.trim(),
+    email: form.elements.email.value.trim(),
+    login: form.elements.login.value.trim(),
+    password: form.elements.password.value,
+    role: form.elements.role.value
+  };
+
+  setAddUserBusy(true);
+
+  try {
+    await adminRequest(
+      `${adminUrlBase}?action=create-user`,
+      {
+        method: 'POST',
+        headers: adminHeaders(true),
+        body: JSON.stringify(payload)
+      }
+    );
+
+    if (totalUsers !== null) {
+      totalUsers++;
+    }
+
+    addUserDialog.close();
+
+    setPageStatus(`${payload.login} was added.`);
+
+    await loadUsers(userSearch.value.trim());
+  } catch (error) {
+    console.error('Create user failed:', error);
+    setPageStatus(error.message || 'Could not create user.');
+  } finally {
+    setAddUserBusy(false);
+  }
+  }
+
+  addUserDialog.addEventListener('cancel', (event) => {
+  if (addUserBusy) {
+    event.preventDefault();
+  }
+  });
 
   // Shows one tab's section and marks its nav button as the current page.
   function showTab(tabId) {
