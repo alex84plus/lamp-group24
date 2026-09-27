@@ -185,7 +185,7 @@ if ($method === 'PUT' && ($_GET['action'] ?? '') === 'password')
 
 // create new admin
 
-if ($method === 'POST' && ($_GET['action'] ?? '') === 'create-admin')
+if ($method === 'POST' && ($_GET['action'] ?? '') === 'create-user')
 {
     $body = getRequestBody();
 
@@ -194,10 +194,16 @@ if ($method === 'POST' && ($_GET['action'] ?? '') === 'create-admin')
     $email     = clean($body['email'] ?? '');
     $login     = clean($body['login'] ?? '');
     $password  = $body['password'] ?? '';
+    $role      = strtoupper(clean($body['role'] ?? 'USER'));
 
     if (!$firstName || !$lastName || !$login || !$password) {
         respond(400, [
             'error' => 'First name, last name, login and password are required'
+        ]);
+    }
+    if (!in_array($role, ['USER', 'ADMIN'], true)) {
+        respond(400, [
+            'error' => 'Invalid role'
         ]);
     }
 
