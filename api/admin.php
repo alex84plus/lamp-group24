@@ -81,6 +81,7 @@ if ($method === 'GET' && ($_GET['action'] ?? '') === 'users')
                 IsDisabled,
                 IsVerified,
                 Created
+                Updated
              FROM Users
              ORDER BY LastName, FirstName'
         );
@@ -108,6 +109,7 @@ if ($method === 'GET' && ($_GET['action'] ?? '') === 'contacts')
             Phone,
             Email,
             Created
+            Updated
          FROM Contacts
          WHERE UserID = ?
          ORDER BY LastName, FirstName'
