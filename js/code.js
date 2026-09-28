@@ -1185,9 +1185,12 @@ async function adminRequest(url, options = {}) {
     const values = [
       contact.ID,
       ownerLabel(owner),
+      contact.FirstName,
+      contact.LastName,
       contact.Email,
       contact.Phone,
       contact.Created,
+      contact.Updated,
     ];
     for (const value of values) row.append(dataCell(value));
     return row;
