@@ -52,7 +52,8 @@ if ($method === 'GET' && ($_GET['action'] ?? '') === 'users')
                 Role,
                 IsDisabled,
                 IsVerified,
-                Created
+                Created,
+                Updated
              FROM Users
              WHERE FirstName LIKE ?
                 OR LastName LIKE ?
@@ -80,7 +81,7 @@ if ($method === 'GET' && ($_GET['action'] ?? '') === 'users')
                 Role,
                 IsDisabled,
                 IsVerified,
-                Created
+                Created,
                 Updated
              FROM Users
              ORDER BY LastName, FirstName'
@@ -108,7 +109,7 @@ if ($method === 'GET' && ($_GET['action'] ?? '') === 'contacts')
             LastName,
             Phone,
             Email,
-            Created
+            Created,
             Updated
          FROM Contacts
          WHERE UserID = ?
