@@ -1096,6 +1096,7 @@ async function adminRequest(url, options = {}) {
       user.IsVerified ? 'Yes' : 'No',
       user.IsDisabled ? 'Yes' : 'No',
       user.Created,
+      user.Updated,
     ];
     for (const value of values) row.append(dataCell(value));
     row.append(actionsCell(user));
